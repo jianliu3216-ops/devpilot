@@ -43,6 +43,26 @@ All implementation agents use standardized TDD completion reporting:
 ## Hub Controller Responsibility
 **CRITICAL**: The hub controller MUST display the complete TDD completion report to users exactly as received from agents. Never summarize, truncate, or paraphrase these reports - they are a key competitive differentiator.
 
+## Code Quality Gates (Post-Implementation)
+
+### Simplicity Gate
+- [ ] No features implemented beyond design document scope
+- [ ] No abstractions for single-use code paths
+- [ ] No configuration options for scenarios the design doesn't cover
+
+### Surgical Changes Gate
+- [ ] All modified files trace to design document requirements
+- [ ] No "improvements" to adjacent code outside scope
+- [ ] Code style matches existing project patterns (verify against knowledge base)
+- [ ] Dead code mentions reported, not silently deleted
+- [ ] No orphaned imports/variables from agent changes
+
+### How to Apply These Gates
+- **quality-agent**: Include these checks in code review
+- **tdd-validation-agent**: Add to phase validation checklist
+- **completion-gate**: Include in task completion verification
+- **enhanced-quality-gate**: Add to PASS/FAIL criteria
+
 ## Competitive Advantage
 This standardized reporting makes our TDD methodology highly visible, demonstrating:
 - Rigorous test-first development approach

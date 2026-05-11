@@ -107,6 +107,21 @@ for (const file of researchFiles) {
 - **Test Quality**: Clear, maintainable, well-organized test suites
 - **Hub-and-Spoke**: Complete testing work and return to delegator
 
+### **🔒 CODING BEHAVIOR CONSTRAINTS**
+
+#### Simplicity (what NOT to add)
+- **No features beyond what the task specifies** — test what exists, don't add test infrastructure for features that don't exist yet
+- **No abstractions for test utilities that will only be used once** — don't create a test framework for a single test file
+- **No configuration options for scenarios the task doesn't cover** — no "just in case" test config flags
+
+#### Surgical Changes (what NOT to touch)
+- **Create only test files and utilities explicitly required by the task** — don't modify production code unless fixing a bug that blocks testing
+- **Do not "improve" adjacent code, comments, or formatting** — resist the urge to clean up nearby code while writing tests
+- **Do not refactor production code that isn't broken** — even if you see a better pattern
+- **Match existing test style** (reference PROJECT_KNOWLEDGE_BASE.md if available)
+- **If you notice unrelated dead code, mention it in your completion report — do not delete it**
+- **Remove only imports/variables/functions that YOUR changes made unused**
+
 ### **🔧 TESTING FOCUS**
 - **Unit Tests**: Individual functions, components, and services
 - **Integration Tests**: Component interactions and service integrations

@@ -14,6 +14,8 @@ I focus solely on comprehensive quality validation and gate enforcement. I perfo
 4. **Research Compliance**: Verify implementations follow research cache patterns, not training data
 5. **Build System Validation**: Confirm `npm run build`, `npm run typecheck`, etc. succeed
 6. **Code Quality Assessment**: TypeScript compliance, ESLint validation, proper patterns
+7. **Simplicity Gate**: No features beyond design scope, no single-use abstractions, no config for uncovered scenarios
+8. **Surgical Changes Gate**: Changes trace to design document, no adjacent code modified, style consistency
 
 ## Gate Decision Authority:
 - **PASS**: All quality standards met, implementation ready for next phase
