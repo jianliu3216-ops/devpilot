@@ -1,0 +1,25 @@
+# 运行时文件（不提交）
+.claude/settings.local.json
+.claude-collective/metrics/
+.taskmaster/docs/prd.txt
+
+# Node.js
+node_modules/
+
+# 临时文件
+*.tmp
+*.bak
+.git_backup/
+
+# 打包文件
+*.zip
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
