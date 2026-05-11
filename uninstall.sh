@@ -1,5 +1,5 @@
 #!/bin/bash
-# CICD 智能流水线 - 卸载脚本
+# Autopilot 智能流水线 - 卸载脚本
 # 移除本流水线安装的 Skills 和 Node.js 工具包
 #
 # 用法：
@@ -18,7 +18,7 @@ pause_exit() {
 }
 
 echo "========================================="
-echo "  CICD 智能流水线 - 卸载"
+echo "  Autopilot 智能流水线 - 卸载"
 echo "========================================="
 echo ""
 
@@ -34,7 +34,7 @@ for skill_dir in "$SCRIPT_DIR"/skills/*/; do
 done
 
 if [ "$REMOVED" -eq 0 ]; then
-    echo "未找到已安装的 CICD Skills"
+    echo "未找到已安装的 Autopilot Skills"
 else
     echo "✅ 已卸载 $REMOVED 个 Skills"
 fi

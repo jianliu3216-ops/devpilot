@@ -1,4 +1,4 @@
-# CICD 流程核心规则（SessionStart 自动注入）
+# Autopilot 流程核心规则（SessionStart 自动注入）
 
 > 本文件由 .claude/hooks/load-behavioral-system.sh 自动加载到每个会话
 > 完整流程详见 README.md

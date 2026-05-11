@@ -1,4 +1,4 @@
-# Claude Code CICD 智能流水线工作规则
+# Claude Code Autopilot 智能流水线工作规则
 
 ## 流程触发规则
 - 当用户输入包含"开始任务"、"执行任务"、"任务"等字样时，**必须先读取项目根目录的 README.md**，以 README.md 为流程的唯一事实源

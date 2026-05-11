@@ -33,7 +33,7 @@ echo "=== RESEARCH FRAMEWORK (.claude-collective/research.md) ==="
 cat .claude-collective/research.md
 echo ""
 
-echo "=== CICD PIPELINE RULES (.claude-collective/cicd-rules.md) ==="
+echo "=== AUTOPILOT PIPELINE RULES (.claude-collective/cicd-rules.md) ==="
 cat .claude-collective/cicd-rules.md
 echo ""
 

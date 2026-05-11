@@ -1,4 +1,4 @@
-# CICD 智能流水线开发流程
+# Autopilot 智能流水线开发流程
 
 本项目是一套基于 Claude Code 的 AI 辅助开发智能流水线，实现从简单自然语言需求 → 需求分析 → PRD → 软件设计 → 代码实现 → 测试用例 → 测试报告的全流程自动化。每个阶段产出需要人工确认后才进入下一阶段，确保质量可控。
 
@@ -6,7 +6,7 @@
 
 ## 设计思路
 
-当前目录 `本仓库根目录（claude-code-cicd）` 是**共用框架目录**，只存放：
+当前目录 `本仓库根目录（claude-code-autopilot）` 是**共用框架目录**，只存放：
 - 所有 Agent 定义（`.claude/agents/`）
 - 所有钩子脚本（`.claude/hooks/`）
 - 框架核心代码（`.claude-collective/`）
@@ -26,7 +26,7 @@
 下面列出**当前共用框架目录**中所有文件，每个都说明其含义和作用。
 
 ```
-本仓库根目录（claude-code-cicd）\ (共用框架目录，只放框架，不放项目产出)
+本仓库根目录（claude-code-autopilot）\ (共用框架目录，只放框架，不放项目产出)
 ├── .claude/
 │   ├── agents/                             # Claude Code 自定义 Agent 定义目录
 │   │   │                                   # 每个 .md 文件定义一个 Agent 的角色和提示词
@@ -887,12 +887,12 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 > 
 > ⚠️ **答：不行！必须做对这两步：**
 > 
-> 1. **必须 `cd` 到本目录**：你需要在命令行 `cd 本仓库根目录（claude-code-cicd）`，然后在这里启动 `claude` 命令。
+> 1. **必须 `cd` 到本目录**：你需要在命令行 `cd 本仓库根目录（claude-code-autopilot）`，然后在这里启动 `claude` 命令。
 > 2. **不能在其他目录使用**：因为所有配置（`CLAUDE.md`、`.claude/agents/`）都在这个目录下，换目录就找不到了。
 > 
 > ✅ 正确启动方式：
 > ```bash
-> cd 本仓库根目录（claude-code-cicd）
+> cd 本仓库根目录（claude-code-autopilot）
 > claude
 > ```
 > 启动后 Claude Code 会自动读取本目录的 `CLAUDE.md` 和 `.claude/agents/`，就能按我们定义的规则工作了。
@@ -953,8 +953,8 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 **路径规则（统一规则）：**
 - ✅ **第一次开始任务（任务 2 或任务 3）必须提供目标项目路径**
 - ✅ **我会记住目标路径**，后续所有任务（任务 4 ~ 任务 8）你不需要重复提供路径
-- ✅ 可以用 `/project-cicd-status 目标项目路径` 查看当前状态或切换项目
-- ✅ 如果新开 Claude 会话忘记了路径，重新用 `project-cicd-status` 设置一下就恢复了
+- ✅ 可以用 `/project-autopilot-status 目标项目路径` 查看当前状态或切换项目
+- ✅ 如果新开 Claude 会话忘记了路径，重新用 `project-autopilot-status` 设置一下就恢复了
 
 **我会帮你严格控制顺序，不会跳任务，自动记住所有依赖：**
 
@@ -1301,7 +1301,7 @@ title {流程图标题}
 Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规则：
 
 ```markdown
-# Claude Code CICD 智能流水线工作规则
+# Claude Code Autopilot 智能流水线工作规则
 
 ## 流程遵循
 严格按照以下阶段执行，每个阶段完成后必须等待用户确认才能进入下一阶段：
@@ -1327,7 +1327,7 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 
 | 命令 | 什么时候用 | 示例 |
 |------|------------|------|
-| `/project-cicd-status 路径` | 查看当前项目状态，或设置/切换目标项目 | `/project-cicd-status D:\projects\my-app` |
+| `/project-autopilot-status 路径` | 查看当前项目状态，或设置/切换目标项目 | `/project-autopilot-status D:\projects\my-app` |
 | `/van "提示内容"` | 让 claude-code-collective 自动路由处理任务 | `/van "基于需求分析生成 PRD"` |
 | `/project-knowledge-base` | 生成历史项目私域知识库（你的自定义 Skill） | `/project-knowledge-base --target 项目路径 --output 输出路径` |
 | 执行任务9 | 需求变更时使用，AI自动分析影响范围 | `执行任务9，需求标识：user-login，需求变更：登录页面增加忘记密码链接` |
@@ -1344,7 +1344,7 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 
 **A:** ❌ 不行。必须满足：
 
-1. ✅ **工作目录正确**：必须 `cd` 到 `本仓库根目录（claude-code-cicd）` 这个目录，然后在这里启动 `claude`
+1. ✅ **工作目录正确**：必须 `cd` 到 `本仓库根目录（claude-code-autopilot）` 这个目录，然后在这里启动 `claude`
 2. ✅ **Git 仓库已初始化**：本目录已经是 Git 仓库了，所以只要 cd 对目录就行
 3. ✅ **Claude Code 版本支持**：需要较新版本的 Claude Code CLI 支持自定义 Agent 和技能
 
@@ -1357,7 +1357,7 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 **A:** 可以。设计上就是**共用框架 + 多项目分离产出**，支持同时处理多个项目。
 
 **使用方式：**
-1. 始终在 `本仓库根目录（claude-code-cicd）` 启动 Claude
+1. 始终在 `本仓库根目录（claude-code-autopilot）` 启动 Claude
 2. 处理哪个项目，就提供那个项目的路径
 3. 所有文档都输出到对应项目自己的目录下
 4. 框架目录保持干净，不会和项目文件混在一起，避免冲突
@@ -1425,11 +1425,11 @@ git reset --hard <commit-id>   # 回滚到指定提交
 
 ---
 
-### Q9: 如果我忘了用 `/project-cicd-status`，是否每次都需要带目录？
+### Q9: 如果我忘了用 `/project-autopilot-status`，是否每次都需要带目录？
 
 **A:**
 - ✅ **只要你第一次开始任务（任务2或任务3）时给了路径**，我就会记住，后续任务**不需要**每次都带
-- ✅ `/project-cicd-status` 主要用于：
+- ✅ `/project-autopilot-status` 主要用于：
   1. 新开 Claude 会话后，恢复记忆告诉你当前在哪个项目
   2. 切换到另一个项目开发
   3. 忘记当前项目路径时，查看状态

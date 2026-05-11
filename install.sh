@@ -1,6 +1,6 @@
 #!/bin/bash
 export TERM=ansi
-# CICD 智能流水线 - 一键安装脚本
+# Autopilot 智能流水线 - 一键安装脚本
 # 兼容：Windows Git Bash / macOS / Linux
 #
 # 前置要求：
@@ -75,7 +75,7 @@ get_node_full_version() {
 }
 
 echo "========================================="
-echo "  CICD 智能流水线 - 安装向导"
+echo "  Autopilot 智能流水线 - 安装向导"
 echo "========================================="
 echo ""
 
@@ -237,7 +237,7 @@ echo ""
 echo "下一步："
 echo "  1. cd $SCRIPT_DIR"
 echo "  2. 启动 claude"
-echo "  3. 输入 /project-cicd-status 开始使用"
+echo "  3. 输入 /project-autopilot-status 开始使用"
 echo ""
 echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新 Skills 生效"
 echo "     重启方式：在 Claude 中输入 /exit，然后重新运行 claude"
