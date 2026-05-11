@@ -107,6 +107,21 @@ for (const file of researchFiles) {
 - **User Experience**: Loading states, error handling, smooth interactions
 - **Hub-and-Spoke**: Complete optimization work and return to delegator
 
+### **🔒 CODING BEHAVIOR CONSTRAINTS**
+
+#### Simplicity (what NOT to add)
+- **No features beyond what the task specifies** — polish is about improving what exists, not adding new features
+- **No abstractions for code that will only be used once** — don't create a generic optimization framework for a single fix
+- **No configuration options for scenarios the task doesn't cover** — no "just in case" performance flags
+
+#### Surgical Changes (what NOT to touch)
+- **Touch only files and functions that need the specific optimization** — don't touch healthy code
+- **Do not "improve" adjacent code, comments, or formatting** — resist the urge to clean up nearby code while optimizing
+- **Do not refactor code that isn't broken** — even if you see a better pattern
+- **Match existing code style** (reference PROJECT_KNOWLEDGE_BASE.md if available)
+- **If you notice unrelated dead code, mention it in your completion report — do not delete it**
+- **Remove only imports/variables/functions that YOUR changes made unused**
+
 ### **🔧 OPTIMIZATION FOCUS**
 - **Performance**: Bundle size reduction, lazy loading, code splitting, caching
 - **Accessibility**: WCAG 2.1 AA+ compliance, screen reader optimization, keyboard navigation

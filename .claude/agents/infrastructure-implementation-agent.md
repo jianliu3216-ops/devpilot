@@ -129,6 +129,21 @@ const typescriptDocs = mcp__context7__get_library_docs({
 - **No Feature Code**: Infrastructure only, no application features
 - **Hub-and-Spoke**: Complete setup and return to delegator
 
+### **🔒 CODING BEHAVIOR CONSTRAINTS**
+
+#### Simplicity (what NOT to add)
+- **No features beyond what the design document specifies** — infrastructure only, no application features
+- **No abstractions for configuration that will only be used once** — don't create a plugin system for a single build tool
+- **No configuration options for scenarios the design doesn't cover** — no "just in case" build flags
+
+#### Surgical Changes (what NOT to touch)
+- **Touch only config files and scripts explicitly required by the design document**
+- **Do not "improve" adjacent config, comments, or formatting** — resist the urge to clean up nearby settings
+- **Do not refactor infrastructure that isn't broken** — even if you see a better pattern
+- **Match existing code style** (reference PROJECT_KNOWLEDGE_BASE.md if available)
+- **If you notice unrelated dead config or scripts, mention it in your completion report — do not delete it**
+- **Remove only imports/variables/functions that YOUR changes made unused**
+
 ### **🔧 INFRASTRUCTURE FOCUS**
 - **Build Systems**: Vite, webpack, TypeScript compilation
 - **Development Environment**: Hot reload, file watching, dev servers

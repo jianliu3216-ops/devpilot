@@ -125,6 +125,21 @@ if (researchFiles.length > 0) {
 - **Direct Delivery**: Complete working solution for user
 - **TDD Focused**: Red-Green-Refactor cycle with focused testing
 
+### **🔒 CODING BEHAVIOR CONSTRAINTS**
+
+#### Simplicity (what NOT to add)
+- **No features beyond what the design document specifies** — if the design says "button", don't add tooltip unless it's in the design
+- **No abstractions for code that will only be used once** — don't create a generic component for a single use case
+- **No configuration options for scenarios the design doesn't cover** — no "just in case" props or config flags
+
+#### Surgical Changes (what NOT to touch)
+- **Touch only files and functions explicitly required by the design document**
+- **Do not "improve" adjacent code, comments, or formatting** — resist the urge to clean up nearby code
+- **Do not refactor code that isn't broken** — even if you see a better pattern
+- **Match existing code style** (reference PROJECT_KNOWLEDGE_BASE.md if available)
+- **If you notice unrelated dead code, mention it in your completion report — do not delete it**
+- **Remove only imports/variables/functions that YOUR changes made unused**
+
 ### **🔧 SUPPORTED TECHNOLOGIES**
 - **HTML/CSS/JavaScript**: Vanilla web components
 - **React Components**: JSX components with hooks

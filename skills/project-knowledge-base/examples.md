@@ -103,11 +103,142 @@
 
 ---
 
-## 6. 代码问题与重构建议（示例表格）
+## 6. 启动入口（示例）
+
+### 6.1 应用主类
+
+| 模块 | 主类 | 类型 | 作用 |
+|---|---|---|---|
+| `xxx-app` | `com.example.XxxApplication` | SERVLET / NONE | 主服务入口，聚合 A/B/C 子模块 |
+| `xxx-web-app` | `com.example.XxxWebApplication` | SERVLET | 管理控制台 Web |
+| `xxx-worker-app` | `com.example.XxxWorkerApplication` | NONE | 后台任务/升级/异步处理 |
+
+### 6.2 部署脚本入口
+
+| 脚本 | 路径 | 作用 |
+|---|---|---|
+| `start.sh` | `deploy/start.sh` | 启动所有服务（DB → 缓存 → Java → 代理） |
+| `stop.sh` | `deploy/stop.sh` | 停止所有服务 |
+| `upgrade.sh` | `deploy/upgrade.sh` | 执行数据库升级 + 替换制品 |
+
+---
+
+## 7. 主要接口列表（示例）
+
+### 7.1 内部 REST 服务
+
+| 服务 ID | 端口 | 路径前缀 | 说明 |
+|---|---|---|---|
+| `UserRestService` | 8080 | `/v1/user` | 用户管理 |
+| `AuthRestService` | 8080 | `/v1/auth` | 认证授权 |
+| `ConfigRestService` | 8080 | `/v1/config` | 配置管理 |
+
+### 7.2 开放协议接口
+
+| 路径 | 说明 |
+|---|---|
+| `/oauth/authorize`、`/oauth/token` | OAuth2 授权 |
+| `/.well-known/openid-configuration` | OIDC 发现 |
+| `/health`、`/check/alive` | 健康检查 |
+
+---
+
+## 8. 数据库表/实体类说明（示例）
+
+### 8.1 表分域
+
+| 脚本/前缀 | 表示例 | 作用 |
+|---|---|---|
+| `default.sql` | `T_CONFIG`、`T_LOG` | 系统基础配置与日志 |
+| `biz.sql` | `T_BIZ_ORDER`、`T_BIZ_ITEM` | 核心业务表 |
+| `monitor.sql` | `T_MONITOR_HISTORY` | 监控与告警 |
+
+### 8.2 主要实体/模型位置
+
+| 路径 | 说明 |
+|---|---|
+| `module/xxx-service/src/main/java/.../entity` | 业务实体 |
+| `module/xxx-service/src/main/java/.../dto` | 接口 DTO |
+| `module/xxx-service/src/main/java/.../bo` | 业务对象 |
+| `common/xxx-common/src/main/java/.../model` | 跨模块复用模型 |
+
+---
+
+## 9. 配置文件说明（示例）
+
+### 9.1 应用配置
+
+| 文件 | 作用 |
+|---|---|
+| `xxx-app/src/main/resources/application.properties` | 主服务配置：端口、数据源、日志等 |
+| `xxx-web-app/src/main/resources/application.properties` | Web 控制台配置：模板引擎、静态资源等 |
+
+### 9.2 部署运行配置
+
+| 文件 | 作用 |
+|---|---|
+| `deploy/config/jdbc.properties` | 数据库连接配置 |
+| `deploy/config/redis.properties` | 缓存连接配置 |
+| `deploy/config/app.properties` | 平台主配置 |
+| `deploy/nginx/*.conf` | 反向代理配置 |
+
+### 9.3 Spring / IoC 配置
+
+| 文件/目录 | 作用 |
+|---|---|
+| `src/main/resources/META-INF/spring-*.xml` | 平台 Bean 装配 |
+| `src/main/resources/i18n/*.properties` | 国际化文案 |
+
+---
+
+## 10. 编译、运行、部署方式（示例）
+
+### 10.1 本地编译
+
+```bash
+# 全量构建
+mvn clean package
+
+# 单模块构建
+mvn clean package -pl xxx-app -am
+```
+
+### 10.2 打包部署包
+
+```bash
+mvn clean package -pl xxx-build -am
+```
+
+产出物包含：`app/*.jar`、`config/**`、`deploy/**`
+
+### 10.3 部署运行
+
+```bash
+./deploy/start.sh    # 启动
+./deploy/stop.sh     # 停止
+./deploy/upgrade.sh  # 升级
+```
+
+---
+
+## 11. 代码问题与重构建议（示例表格）
 
 | 问题ID | 发现点 | 证据位置 | 影响 | 建议方案 | 优先级 |
 |---|---|---|---|---|---|
 | R-01 | 工具类职责过载 | `common/utils/xxxUtil.java` | 修改风险大、复用困难 | 拆分单一职责工具并加单测 | 高 |
 | R-02 | 重复的 DTO 转换逻辑 | `*/ServiceImpl.java` 多处 | 维护成本高 | 提取统一转换器，替换调用点 | 中 |
+
+---
+
+## 12. 后续维护建议（示例）
+
+1. **补齐环境文档**：明确开发/测试/生产的依赖版本、仓库地址、凭据管理方式。
+2. **生成接口文档**：引入 OpenAPI 或按服务 ID 维护方法级说明。
+3. **生成数据字典**：从建表脚本和 Mapper 自动生成字段说明，避免人工维护漂移。
+4. **清理敏感信息**：检查配置文件和 CI 脚本中是否有不应入库的 token、密码。
+5. **梳理模块边界**：明确聚合模块中各子模块的调用约定和发布边界。
+6. **规范配置来源**：整理 classpath 配置、外置配置、平台 XML 的优先级和变更流程。
+7. **增强测试**：围绕核心业务路径增加自动化测试覆盖。
+8. **维护升级脚本**：补齐回滚演练、幂等性检查、升级前备份校验。
 
 
