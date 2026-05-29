@@ -33,8 +33,6 @@ cd claude-code-autopilot
 claude
 ```
 
-启动后看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 即表示成功。
-
 ## 新会话恢复
 
 每次新开 Claude Code 会话后，先用以下命令恢复工作状态：
