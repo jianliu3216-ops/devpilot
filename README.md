@@ -887,13 +887,13 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 
 > ❓ **常见问题：如果我随便开一个 Claude Code 会话就可以使用吗？**
 > 
-> ✅ **答：可以！运行 `bash install.sh` 后，全局 Hooks 已自动配置。**
+> ⚠️ **答：不行。必须 `cd` 到 autopilot 目录启动 Claude Code。**
 > 
-> **任意目录**启动 Claude Code，看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 即表示加载成功。
+> Skills 通过 install.sh 注册到 `~/.claude/skills/` 后全局可用，但**流程规则和自动触发**只在 autopilot 项目目录下生效。
 > 
-> 如果没看到此提示，检查是否运行过 `install.sh`，或手动执行：
 > ```bash
-> bash 本仓库根目录（claude-code-autopilot）/install.sh
+> cd 本仓库根目录（claude-code-autopilot）
+> claude
 > ```
 
 ---
@@ -1341,11 +1341,14 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 
 ### Q1: 如果我随便开一个 Claude Code 会话就可以使用吗？
 
-**A:** ✅ 可以！安装时 `install.sh` 已自动配置全局 Hooks，**任意目录**启动 Claude Code 均可使用 Autopilot。
+**A:** 必须 `cd` 到 autopilot 目录启动。Skills 虽然全局可用，但流程规则（CLAUDE.md、行为约束）只在项目目录下加载。
 
-启动后看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 即表示加载成功。
+```bash
+cd L:/jit/claude-code-autopilot
+claude
+```
 
-如果没看到此提示，检查是否运行过 `bash install.sh`，或手动确认 `~/.claude/settings.json` 中配置了 SessionStart hooks。
+启动后看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 表示加载成功。
 
 ---
 
@@ -1354,7 +1357,7 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 **A:** 可以。设计上就是**共用框架 + 多项目分离产出**，支持同时处理多个项目。
 
 **使用方式：**
-1. 任意目录启动 Claude Code（全局 Hooks 自动加载 Autopilot 规则）
+1. 始终在 autopilot 目录启动 Claude Code
 2. 处理哪个项目，就提供那个项目的路径
 3. 所有文档都输出到对应项目自己的目录下
 4. 框架目录保持干净，不会和项目文件混在一起，避免冲突
