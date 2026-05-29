@@ -4,7 +4,20 @@
 > 完整流程详见 README.md
 
 ## 触发规则
-当用户输入包含"开始任务N"、"执行任务N"、"任务N"、"需求分析"、"生成PRD"等关键词时，必须按本规则执行。
+当用户输入包含以下关键词时，自动调用对应 Skill：
+
+| 关键字 | 自动调用 Skill | 示例 |
+|-------|-------------|------|
+| `需求分析`、`分析需求` | requirement-analysis | `需求分析：我要做用户登录模块，目标项目：D:\my-app` |
+| `生成PRD`、`PRD`、`产品需求文档` | generate-prd | `生成PRD` |
+| `软件设计`、`架构设计`、`生成设计文档`、`变更策略` | software-design | `确认PRD，继续软件设计` |
+| `代码实现`、`实现代码`、`开始编码` | implement-code | `确认设计，开始代码实现` |
+| `测试用例`、`生成测试用例`、`回归验证` | test-cases | `确认代码，生成测试用例` |
+| `测试报告`、`生成测试报告`、`运行测试` | test-report | `确认用例，生成测试报告` |
+| `知识库更新`、`更新知识库` | test-report 后自动执行 | `更新知识库` |
+| `需求变更`、`变更需求` | requirement-change | `需求变更：user-login 增加忘记密码` |
+| `生成知识库`、`项目知识库`、`PROJECT_KNOWLEDGE_BASE` | project-knowledge-base | `生成知识库，目标项目：D:\my-app` |
+| `/project-autopilot-status`、`查看状态` | project-autopilot-status | `/project-autopilot-status` |
 
 ## 输出路径规则（最高优先级）
 - **所有文档输出到目标项目目录**，绝不输出到框架目录
