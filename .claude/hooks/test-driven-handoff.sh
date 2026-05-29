@@ -1,7 +1,18 @@
 #!/bin/bash
-# test-driven-handoff.sh
-# TRUE Test-Driven Handoffs with Contract Validation
-# Executes actual test contracts to validate agent handoffs
+# ============================================================================
+# test-driven-handoff.sh — Agent Handoff & TDD Validation Engine
+# ============================================================================
+# 职责分层（按执行顺序）：
+#   L1: Handoff Detection       (detect_handoff)      — 检测 Agent 输出中的 handoff 模式
+#   L2: TDD Validation          (execute_tdd_validation) — 验证 Agent 输出的TDD完整性
+#   L3: Phase Completion        (detect_orchestrator_phase_completion) — 检测阶段完成
+#   L4: Agent TDD Checkpoint    (agent_tdd_checkpoint) — 运行 vitest 验证测试通过
+#   L5: Contract Validation     (validate_*)           — 握手令牌/输出/状态契约校验
+#
+# 事件类型：
+#   SubagentStop  — Agent完成时触发（主入口）
+#   PostToolUse   — Task工具调用后触发（安全网）
+# ============================================================================
 
 # Set up logging
 LOG_FILE="/tmp/test-driven-handoff.log"
@@ -74,7 +85,7 @@ if [[ -z "$AGENT_OUTPUT" && -n "$TRANSCRIPT_PATH" && -f "$TRANSCRIPT_PATH" ]]; t
     log "Extracted from transcript: $(echo "$AGENT_OUTPUT" | head -c 100)..."
 fi
 HANDOFF_TOKEN=${HANDOFF_TOKEN:-""}
-CLAUDE_PROJECT_DIR=${CLAUDE_PROJECT_DIR:-"/mnt/h/Active/taskmaster-agent-claude-code"}
+CLAUDE_PROJECT_DIR=${CLAUDE_PROJECT_DIR:-"."}
 
 log "TRUE TEST-DRIVEN HANDOFF VALIDATION - Event: $EVENT, Agent: $SUBAGENT_NAME"
 log "JSON INPUT: $INPUT_JSON"

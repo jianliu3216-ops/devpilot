@@ -172,7 +172,7 @@ if [ "$INSTALL_SKILLS" = true ]; then
         echo "⚠️  未找到 Skills 文件，请确认 skills/ 目录结构正确"
         pause_exit 1
     fi
-    echo "已安装 $SKILL_COUNT 个 Skills"
+    echo "已安装 $SKILL_COUNT 个 Skills（含需求分析/PRD/设计/代码实现/测试用例/测试报告/需求变更等）"
 fi
 
 # --- 提示安装工具包（如果未指定 --tools 且工具包未安装） ---
@@ -228,6 +228,26 @@ if [ "$INSTALL_TOOLS" = true ]; then
     fi
 fi
 
+# --- 提示安装 CodeGraph（可选） ---
+if ! command -v codegraph &> /dev/null; then
+    echo ""
+    echo "--- 推荐工具：CodeGraph（代码图谱分析） ---"
+    echo "CodeGraph 可辅助知识库生成、变更影响分析、死代码检测等"
+    echo "与 Autopilot 流程深度协同，但不是必装依赖"
+    echo ""
+    echo "是否安装 CodeGraph？(y/n)"
+    read -r INSTALL_CODEGRAPH
+    if [ "$INSTALL_CODEGRAPH" = "y" ] || [ "$INSTALL_CODEGRAPH" = "Y" ]; then
+        echo "正在安装 @optave/codegraph..."
+        npm install -g @optave/codegraph 2>&1 | tail -3
+        if command -v codegraph &> /dev/null; then
+            echo "✅ CodeGraph 安装成功"
+        else
+            echo "⚠️  CodeGraph 安装失败，可稍后手动执行：npm install -g @optave/codegraph"
+        fi
+    fi
+fi
+
 # --- 完成 ---
 echo ""
 echo "========================================="
@@ -237,7 +257,8 @@ echo ""
 echo "下一步："
 echo "  1. cd $SCRIPT_DIR"
 echo "  2. 启动 claude"
-echo "  3. 输入 /project-autopilot-status 开始使用"
+echo "  3. 输入 /project-autopilot-status 目标项目路径 开始使用"
+echo "     （老用户也可用 /project-cicd-status 目标项目路径）"
 echo ""
 echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新 Skills 生效"
 echo "     重启方式：在 Claude 中输入 /exit，然后重新运行 claude"
@@ -245,6 +266,7 @@ echo ""
 echo "补充命令："
 echo "  bash install.sh --tools       # 补装 Node.js 工具包（docx/xlsx 等）"
 echo "  bash install.sh --tools-only  # 只装工具包，不动 Skills"
+echo "  npm install -g @optave/codegraph  # 安装 CodeGraph（代码图谱分析）"
 echo ""
 echo "按回车键退出..."
 read -r

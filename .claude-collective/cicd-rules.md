@@ -45,3 +45,10 @@
 
 ## 知识库更新（流程闭环）
 流程最后一步（测试报告完成）必须执行知识库增量更新，不全量重扫。
+
+## 推荐工具：CodeGraph
+- **知识库生成**：`codegraph build` 预生成依赖图 → 提升模块分析准确性和效率
+- **变更分析**：`codegraph fn-impact <函数>` 精确计算变更影响半径
+- **质量检查**：`codegraph dead-code` 检测死代码、`codegraph check` CI门禁
+- 安装：`npm install -g @optave/codegraph`
+- 非必装依赖，但有它协同效果更好

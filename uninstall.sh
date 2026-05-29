@@ -22,7 +22,7 @@ echo "  Autopilot 智能流水线 - 卸载"
 echo "========================================="
 echo ""
 
-# --- 卸载 Skills（仅删除本项目安装的 4 个） ---
+# --- 卸载 Skills（删除本项目安装的全部 Skills） ---
 REMOVED=0
 for skill_dir in "$SCRIPT_DIR"/skills/*/; do
     skill_name=$(basename "$skill_dir")

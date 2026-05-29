@@ -14,6 +14,7 @@ description: Analyze an existing codebase and produce PROJECT_KNOWLEDGE_BASE.md 
 执行本 Skill 前：
 1. 读取同级目录 `reference.md` → 了解各表格的字段标准
 2. 读取同级目录 `examples.md` → 了解最终输出的结构示例
+3. **推荐**：如果项目安装了 CodeGraph (`npm install -g @optave/codegraph`)，先在目标项目执行 `codegraph build` 预生成依赖图谱，可以大幅提升 Phase 1-2 的模块分析准确性、减少 AI 手动扫描的上下文消耗
 
 严格遵循 `reference.md` 的字段定义输出。
 
