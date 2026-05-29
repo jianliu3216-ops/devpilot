@@ -14,7 +14,7 @@ description: 执行测试并生成测试报告，包含测试概览、结果统�
 
 ## 执行步骤
 
-1. **读取 README.md**：获取流程规则
+1. **读取 Autopilot 框架目录的 `README.md`**：获取完整流程规则
 2. **读取测试用例文档**：`04-test-cases.md` 或 `04-regression-checklist.md`
 3. **运行完整测试套件**，收集测试结果
 4. **按变更级别输出**：

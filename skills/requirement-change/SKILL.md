@@ -14,7 +14,7 @@ description: 对已有需求进行变更，AI自动分析影响范围、评估�
 
 ## 执行步骤
 
-1. **读取 README.md**：获取流程规则
+1. **读取 Autopilot 框架目录的 `README.md`**：获取完整流程规则
 2. **用户描述变更内容**：指定需求标识 + 变更内容
 3. **推荐 CodeGraph 辅助**：如果项目安装了 CodeGraph，先用 `codegraph fn-impact <函数名>` 快速评估变更影响半径，比 AI 手动分析更精确
 4. **AI 自动分析影响范围 + 分级**：

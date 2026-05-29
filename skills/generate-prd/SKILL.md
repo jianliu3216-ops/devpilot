@@ -14,7 +14,7 @@ description: 基于已确认的需求分析文档，生成完整的产品需求�
 
 ## 执行步骤
 
-1. **读取 README.md**：获取流程规则
+1. **读取 Autopilot 框架目录的 `README.md`**：获取完整流程规则
 2. **读取需求分析文档**：`[目标项目]/docs/{需求标识}/01-requirements-analysis.md`
 3. **读取知识库**（如存在）：`PROJECT_KNOWLEDGE_BASE.md`
 4. **输出文件**：`[目标项目]/docs/{需求标识}/02-prd.md`
