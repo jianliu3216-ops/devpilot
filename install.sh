@@ -238,21 +238,22 @@ if ! npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
     echo ""
 
     # --- CodeGraph 安装前置检查 ---
+    # 复用前面已检测的 NODE_MAJOR / NODE_FULL，不再重复查询
     CODEGRAPH_CAN_INSTALL=true
-    NODE_VERSION=$(node -v 2>/dev/null | sed 's/^v//')
-    NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
+    CODEGRAPH_NODE_MAJOR="$NODE_MAJOR"
+    CODEGRAPH_NODE_MINOR=$(echo "$NODE_FULL" | cut -d. -f2)
 
-    # 1. Node.js 版本检查 (需要 >= 22.6)
-    if [ -z "$NODE_VERSION" ]; then
+    # 1. Node.js 版本检查 (CodeGraph 需要 >= 22.6)
+    if [ -z "$NODE_FULL" ]; then
         echo "❌ 未检测到 Node.js，CodeGraph 需要 Node.js >= 22.6"
         CODEGRAPH_CAN_INSTALL=false
-    elif [ "$NODE_MAJOR" -lt 22 ]; then
-        echo "⚠️  当前 Node.js: v$NODE_VERSION，CodeGraph 需要 >= 22.6"
+    elif [ "$CODEGRAPH_NODE_MAJOR" -lt 22 ] 2>/dev/null; then
+        echo "⚠️  当前 Node.js: $NODE_FULL，CodeGraph 需要 >= 22.6"
         echo "   请先升级 Node.js 22+ 再安装 CodeGraph"
         echo "   下载地址: https://nodejs.org (推荐 22.x LTS)"
         CODEGRAPH_CAN_INSTALL=false
-    elif [ "$NODE_MAJOR" -eq 22 ] && [ "$(echo "$NODE_VERSION" | cut -d. -f2)" -lt 6 ]; then
-        echo "⚠️  当前 Node.js: v$NODE_VERSION，CodeGraph 需要 >= 22.6"
+    elif [ "$CODEGRAPH_NODE_MAJOR" -eq 22 ] && [ "$CODEGRAPH_NODE_MINOR" -lt 6 ] 2>/dev/null; then
+        echo "⚠️  当前 Node.js: $NODE_FULL，CodeGraph 需要 >= 22.6"
         echo "   请升级到 Node.js 22.6+ 或 23+"
         CODEGRAPH_CAN_INSTALL=false
     fi
@@ -303,7 +304,7 @@ echo "使用方式（必须在 autopilot 目录下启动 Claude Code）："
 echo "  cd $SCRIPT_DIR"
 echo "  claude"
 echo ""
-echo "启动后看到「✅ Autopilot 智能流水线 v1.5 — 就绪」表示成功。"
+echo "启动后看到「✅ Autopilot 智能流水线 v$(cat "$SCRIPT_DIR/VERSION") — 就绪」表示成功。"
 echo ""
 echo "常用触发关键字："
 echo "  需求分析：功能描述，目标项目：D:\\my-project"

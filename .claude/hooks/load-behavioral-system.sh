@@ -1,9 +1,10 @@
 #!/bin/bash
-# Load Collective Behavioral System (Slim v1.5)
+# Load Collective Behavioral System
 # SessionStart hook - loads only critical behavioral files
 # Detailed docs loaded on-demand via @import when /van is called
 
-echo "✅ Autopilot 智能流水线 v1.5 — 就绪"
+AUTOPILOT_VERSION=$(cat VERSION 2>/dev/null || echo "?.?")
+echo "✅ Autopilot 智能流水线 v${AUTOPILOT_VERSION} — 就绪"
 
 # Critical: Global Decision Engine (auto-delegation, always active per DECISION.md)
 cat .claude-collective/DECISION.md

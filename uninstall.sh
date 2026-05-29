@@ -23,6 +23,17 @@ echo "========================================="
 echo ""
 
 # --- 卸载 Skills（删除本项目安装的全部 Skills） ---
+echo "将删除以下内容："
+echo "  - ~/.claude/skills/ 下的 Autopilot Skills"
+echo "  - ~/.claude/tools/node-libs/ 工具包"
+echo ""
+echo "是否确认卸载？(y/n)"
+read -r CONFIRM
+if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
+    echo "已取消卸载"
+    pause_exit 0
+fi
+
 REMOVED=0
 for skill_dir in "$SCRIPT_DIR"/skills/*/; do
     skill_name=$(basename "$skill_dir")

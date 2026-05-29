@@ -894,7 +894,7 @@ cd L:/jit/claude-code-autopilot
 claude
 ```
 
-启动后看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 表示加载成功。
+启动后看到 `✅ Autopilot 智能流水线 v{版本号} — 就绪` 表示加载成功。
 
 ---
 
