@@ -229,21 +229,66 @@ if [ "$INSTALL_TOOLS" = true ]; then
 fi
 
 # --- 提示安装 CodeGraph（可选） ---
-if ! command -v codegraph &> /dev/null; then
+# 用 npm ls 判断包是否真正安装，避免残留 bin 文件误判
+if ! npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
     echo ""
     echo "--- 推荐工具：CodeGraph（代码图谱分析） ---"
     echo "CodeGraph 可辅助知识库生成、变更影响分析、死代码检测等"
     echo "与 Autopilot 流程深度协同，但不是必装依赖"
     echo ""
-    echo "是否安装 CodeGraph？(y/n)"
-    read -r INSTALL_CODEGRAPH
-    if [ "$INSTALL_CODEGRAPH" = "y" ] || [ "$INSTALL_CODEGRAPH" = "Y" ]; then
-        echo "正在安装 @optave/codegraph..."
-        npm install -g @optave/codegraph 2>&1 | tail -3
-        if command -v codegraph &> /dev/null; then
-            echo "✅ CodeGraph 安装成功"
-        else
-            echo "⚠️  CodeGraph 安装失败，可稍后手动执行：npm install -g @optave/codegraph"
+
+    # --- CodeGraph 安装前置检查 ---
+    CODEGRAPH_CAN_INSTALL=true
+    NODE_VERSION=$(node -v 2>/dev/null | sed 's/^v//')
+    NODE_MAJOR=$(echo "$NODE_VERSION" | cut -d. -f1)
+
+    # 1. Node.js 版本检查 (需要 >= 22.6)
+    if [ -z "$NODE_VERSION" ]; then
+        echo "❌ 未检测到 Node.js，CodeGraph 需要 Node.js >= 22.6"
+        CODEGRAPH_CAN_INSTALL=false
+    elif [ "$NODE_MAJOR" -lt 22 ]; then
+        echo "⚠️  当前 Node.js: v$NODE_VERSION，CodeGraph 需要 >= 22.6"
+        echo "   请先升级 Node.js 22+ 再安装 CodeGraph"
+        echo "   下载地址: https://nodejs.org (推荐 22.x LTS)"
+        CODEGRAPH_CAN_INSTALL=false
+    elif [ "$NODE_MAJOR" -eq 22 ] && [ "$(echo "$NODE_VERSION" | cut -d. -f2)" -lt 6 ]; then
+        echo "⚠️  当前 Node.js: v$NODE_VERSION，CodeGraph 需要 >= 22.6"
+        echo "   请升级到 Node.js 22.6+ 或 23+"
+        CODEGRAPH_CAN_INSTALL=false
+    fi
+
+    # 2. better-sqlite3 编译环境检查 (Windows)
+    if [ "$CODEGRAPH_CAN_INSTALL" = true ] && uname -s 2>/dev/null | grep -qi "mingw\|msys\|cygwin"; then
+        # prebuild-install 会优先下载预编译二进制，若网络失败回退到 node-gyp 编译
+        # 这里只做提示，不阻塞安装
+        if ! command -v node-gyp &> /dev/null && ! ls "C:/Program Files/Microsoft Visual Studio"* &> /dev/null && ! ls "C:/Program Files (x86)/Microsoft Visual Studio"* &> /dev/null; then
+            echo "💡 提示: 未检测到 Visual Studio C++ 工具链"
+            echo "   better-sqlite3 有预编译二进制，通常无需 VS。"
+            echo "   如果安装失败，可安装 Visual Studio 2022 Build Tools"
+            echo "   勾选「Desktop development with C++」工作负载"
+        fi
+    fi
+
+    if [ "$CODEGRAPH_CAN_INSTALL" = false ]; then
+        echo ""
+        echo "⏭️  跳过 CodeGraph 安装（环境不满足）"
+    else
+        echo "是否安装 CodeGraph？(y/n)"
+        read -r INSTALL_CODEGRAPH
+        if [ "$INSTALL_CODEGRAPH" = "y" ] || [ "$INSTALL_CODEGRAPH" = "Y" ]; then
+            echo "正在安装 @optave/codegraph..."
+            npm install -g @optave/codegraph 2>&1
+            echo ""
+            # Verify: check npm ls confirms package installed
+            if npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
+                echo "✅ CodeGraph 安装成功"
+            elif [ -f "$(npm prefix -g 2>/dev/null)/codegraph" ] || [ -f "$(npm prefix -g 2>/dev/null)/codegraph.cmd" ]; then
+                echo "✅ CodeGraph 安装成功"
+            else
+                echo "⚠️  CodeGraph 安装失败"
+                echo "   可能原因: 网络问题导致预编译二进制下载失败，且缺少 VS C++ 编译环境"
+                echo "   手动重试: npm install -g @optave/codegraph"
+            fi
         fi
     fi
 fi
