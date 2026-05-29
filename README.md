@@ -887,17 +887,14 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 
 > ❓ **常见问题：如果我随便开一个 Claude Code 会话就可以使用吗？**
 > 
-> ⚠️ **答：不行！必须做对这两步：**
+> ✅ **答：可以！运行 `bash install.sh` 后，全局 Hooks 已自动配置。**
 > 
-> 1. **必须 `cd` 到本目录**：你需要在命令行 `cd 本仓库根目录（claude-code-autopilot）`，然后在这里启动 `claude` 命令。
-> 2. **不能在其他目录使用**：因为所有配置（`CLAUDE.md`、`.claude/agents/`）都在这个目录下，换目录就找不到了。
+> **任意目录**启动 Claude Code，看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 即表示加载成功。
 > 
-> ✅ 正确启动方式：
+> 如果没看到此提示，检查是否运行过 `install.sh`，或手动执行：
 > ```bash
-> cd 本仓库根目录（claude-code-autopilot）
-> claude
+> bash 本仓库根目录（claude-code-autopilot）/install.sh
 > ```
-> 启动后 Claude Code 会自动读取本目录的 `CLAUDE.md` 和 `.claude/agents/`，就能按我们定义的规则工作了。
 
 ---
 
@@ -1344,13 +1341,11 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 
 ### Q1: 如果我随便开一个 Claude Code 会话就可以使用吗？
 
-**A:** ❌ 不行。必须满足：
+**A:** ✅ 可以！安装时 `install.sh` 已自动配置全局 Hooks，**任意目录**启动 Claude Code 均可使用 Autopilot。
 
-1. ✅ **工作目录正确**：必须 `cd` 到 `本仓库根目录（claude-code-autopilot）` 这个目录，然后在这里启动 `claude`
-2. ✅ **Git 仓库已初始化**：本目录已经是 Git 仓库了，所以只要 cd 对目录就行
-3. ✅ **Claude Code 版本支持**：需要较新版本的 Claude Code CLI 支持自定义 Agent 和技能
+启动后看到 `✅ Autopilot 智能流水线 v1.5 — 就绪` 即表示加载成功。
 
-为什么？因为所有的配置（`CLAUDE.md` 规则、`.claude/agents/` 里的 Agent 定义）都在这个目录里，换目录 Claude 就读不到这些配置，就不会按我们的流程工作。
+如果没看到此提示，检查是否运行过 `bash install.sh`，或手动确认 `~/.claude/settings.json` 中配置了 SessionStart hooks。
 
 ---
 
@@ -1359,7 +1354,7 @@ Claude Code 会自动读取这个文件，所有 Agent 都必须遵守这些规�
 **A:** 可以。设计上就是**共用框架 + 多项目分离产出**，支持同时处理多个项目。
 
 **使用方式：**
-1. 始终在 `本仓库根目录（claude-code-autopilot）` 启动 Claude
+1. 任意目录启动 Claude Code（全局 Hooks 自动加载 Autopilot 规则）
 2. 处理哪个项目，就提供那个项目的路径
 3. 所有文档都输出到对应项目自己的目录下
 4. 框架目录保持干净，不会和项目文件混在一起，避免冲突

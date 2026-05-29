@@ -293,19 +293,81 @@ if ! npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
     fi
 fi
 
+# --- 配置全局 Autopilot Hooks（任意目录启动 Claude Code 都加载） ---
+AUTOPILOT_HOOK_SCRIPT="$SCRIPT_DIR/.claude/hooks/load-behavioral-system.sh"
+USER_SETTINGS="$HOME/.claude/settings.json"
+
+echo ""
+echo "--- 全局 Autopilot Hooks 配置 ---"
+echo "作用：任意目录启动 Claude Code 时自动加载 Autopilot 流程规则"
+echo ""
+
+if [ ! -f "$USER_SETTINGS" ]; then
+    echo "{}" > "$USER_SETTINGS"
+fi
+
+# 检查是否已配置过
+if grep -q "load-behavioral-system.sh" "$USER_SETTINGS" 2>/dev/null; then
+    echo "✅ 全局 Autopilot Hooks 已配置，跳过"
+else
+    echo "正在配置全局 Hooks..."
+    # 使用 node 来处理 JSON（比手动拼接更可靠）
+    node -e "
+        const fs = require('fs');
+        const settings = JSON.parse(fs.readFileSync('$USER_SETTINGS', 'utf8'));
+        settings.hooks = settings.hooks || {};
+        settings.hooks.SessionStart = settings.hooks.SessionStart || [];
+        // 检查是否已有 startup matcher
+        const hasStartup = settings.hooks.SessionStart.some(h => h.matcher === 'startup');
+        const hasResume = settings.hooks.SessionStart.some(h => h.matcher === 'resume');
+        const hasClear = settings.hooks.SessionStart.some(h => h.matcher === 'clear');
+        if (!hasStartup) {
+            settings.hooks.SessionStart.push({
+                matcher: 'startup',
+                hooks: [{ type: 'command', command: '$AUTOPILOT_HOOK_SCRIPT' }]
+            });
+        }
+        if (!hasResume) {
+            settings.hooks.SessionStart.push({
+                matcher: 'resume',
+                hooks: [{ type: 'command', command: '$AUTOPILOT_HOOK_SCRIPT' }]
+            });
+        }
+        if (!hasClear) {
+            settings.hooks.SessionStart.push({
+                matcher: 'clear',
+                hooks: [{ type: 'command', command: '$AUTOPILOT_HOOK_SCRIPT' }]
+            });
+        }
+        fs.writeFileSync('$USER_SETTINGS', JSON.stringify(settings, null, 2) + '\n');
+    " 2>&1
+    if [ $? -eq 0 ]; then
+        echo "✅ 全局 Autopilot Hooks 配置成功"
+    else
+        echo "⚠️  自动配置失败，请手动执行以下步骤："
+        echo "   在 ~/.claude/settings.json 的 hooks.SessionStart 中添加："
+        echo "   { \"matcher\": \"startup\", \"hooks\": [{ \"type\": \"command\", \"command\": \"$AUTOPILOT_HOOK_SCRIPT\" }] }"
+    fi
+fi
+
 # --- 完成 ---
 echo ""
 echo "========================================="
 echo "  ✅ 安装完成！"
 echo "========================================="
 echo ""
-echo "下一步："
-echo "  1. cd $SCRIPT_DIR"
-echo "  2. 启动 claude"
-echo "  3. 输入 /project-autopilot-status 目标项目路径 开始使用"
-echo "     （老用户也可用 /project-cicd-status 目标项目路径）"
+echo "Autopilot 已全局配置，任意目录启动 Claude Code 即可使用。"
+echo "启动后看到「✅ Autopilot 智能流水线 v1.5 — 就绪」表示成功。"
 echo ""
-echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新 Skills 生效"
+echo "使用方式："
+echo "  需求分析：功能描述，目标项目：D:\\my-project"
+echo "  /project-autopilot-status        → 查看项目状态"
+echo "  /requirement-analysis            → 需求分析"
+echo "  /project-knowledge-base          → 生成项目知识库"
+echo "  /generate-prd                    → 生成PRD"
+echo "  ...更多命令见 QUICK_START.md"
+echo ""
+echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新配置生效"
 echo "     重启方式：在 Claude 中输入 /exit，然后重新运行 claude"
 echo ""
 echo "补充命令："
