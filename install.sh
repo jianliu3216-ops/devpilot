@@ -118,7 +118,29 @@ if ! command -v git &> /dev/null; then
 fi
 echo "✅ git: $(git --version)"
 
-# 3. Claude Code（硬性依赖）
+# 3. Python 3（ui-ux-pro-max skill 需要，非硬性依赖）
+PYTHON3_AVAILABLE=false
+PYTHON3_CMD=""
+if command -v python3 &> /dev/null; then
+    PYTHON3_CMD="python3"
+    PYTHON3_AVAILABLE=true
+elif command -v python &> /dev/null; then
+    local py_ver=$(python --version 2>&1 | grep -oE 'Python 3\.' | head -1)
+    if [ -n "$py_ver" ]; then
+        PYTHON3_CMD="python"
+        PYTHON3_AVAILABLE=true
+    fi
+fi
+if [ "$PYTHON3_AVAILABLE" = true ]; then
+    echo "✅ Python 3: $($PYTHON3_CMD --version 2>&1)"
+else
+    echo "⚠️  未检测到 Python 3（ui-ux-pro-max 搜索功能需要）"
+    echo "   安装方式：https://www.python.org/downloads/"
+    echo "   或: winget install Python.Python.3.12"
+    echo ""
+fi
+
+# 4. Claude Code（硬性依赖）
 # 用 type 检测，避免 command -v claude 触发 TTY 检测输出
 if ! type claude &> /dev/null; then
     echo "❌ 未检测到 Claude Code CLI"
@@ -321,6 +343,12 @@ echo "补充命令："
 echo "  bash install.sh --tools       # 补装 Node.js 工具包（docx/xlsx 等）"
 echo "  bash install.sh --tools-only  # 只装工具包，不动 Skills"
 echo "  npm install -g @optave/codegraph  # 安装 CodeGraph（代码图谱分析）"
+if [ "$PYTHON3_AVAILABLE" = false ]; then
+echo ""
+echo "⚠️  Python 3 未安装，ui-ux-pro-max 搜索功能不可用"
+echo "    安装 Python 3: https://www.python.org/downloads/"
+echo "    或: winget install Python.Python.3.12"
+fi
 echo ""
 echo "按回车键退出..."
 read -r

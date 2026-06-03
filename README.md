@@ -33,7 +33,7 @@
 | `.claude/hooks/` | 钩子脚本（SessionStart 注入规则等） |
 | `.claude/settings.json` | 项目级设置 |
 | `.claude-collective/` | 框架核心（cicd-rules.md 是规则摘要） |
-| `skills/` | Autopilot Skill 定义（10 个） |
+| `skills/` | Autopilot Skill 定义（13 个，含 UI/UX 设计增强） |
 | `CLAUDE.md` | 项目行为规则 |
 | `README.md` | 本文件（AI 规则书） |
 | `QUICK_START.md` | 快速参考 |
