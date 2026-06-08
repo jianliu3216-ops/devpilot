@@ -1,4 +1,4 @@
-# Autopilot 智能流水线 - 状态
+# DevPilot - 状态
 
 **作用：** 每次新开 Claude Code 会话后，调用这个 Skill 自动读取流程文档，恢复工作状态。
 

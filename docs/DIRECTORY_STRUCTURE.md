@@ -1,4 +1,4 @@
-# Autopilot 框架完整目录结构
+# DevPilot 框架完整目录结构
 
 > 本文件由 README.md 抽取，供需要了解完整目录结构时参考。
 > 日常使用不需要读这个文件，README.md 已包含足够信息。
@@ -6,7 +6,7 @@
 ## 共用框架目录
 
 ```
-本仓库根目录（claude-code-autopilot）\ (共用框架目录，只放框架，不放项目产出)
+本仓库根目录（devpilot）\ (共用框架目录，只放框架，不放项目产出)
 ├── .claude/
 │   ├── agents/                             # Claude Code 自定义 Agent 定义目录
 │   │   │                                   # 每个 .md 文件定义一个 Agent 的角色和提示词

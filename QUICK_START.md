@@ -1,4 +1,4 @@
-# Autopilot 智能流水线 — 快速开始指南
+# DevPilot — 快速开始指南
 
 ## 前置要求
 
@@ -12,8 +12,8 @@
 
 ```bash
 # 1. 克隆仓库
-git clone <本仓库地址> claude-code-autopilot
-cd claude-code-autopilot
+git clone <本仓库地址> devpilot
+cd devpilot
 
 # 2. 一键安装（Skills + 基础工具包）
 bash install.sh --tools
@@ -29,7 +29,7 @@ npm install -g @optave/codegraph
 
 ```bash
 # 必须在框架目录下启动 Claude Code
-cd claude-code-autopilot
+cd devpilot
 claude
 ```
 

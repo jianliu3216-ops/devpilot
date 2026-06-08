@@ -1,4 +1,4 @@
-# Autopilot 智能流水线开发流程
+# DevPilot — AI 驱动的智能开发流水线
 
 > **导航**: [快速开始](QUICK_START.md) | [知识库规则](docs/KNOWLEDGE_BASE_RULES.md) | [安装指南](QUICK_START.md#安装)
 
@@ -8,7 +8,7 @@
 
 ## 设计思路
 
-当前目录 `本仓库根目录（claude-code-autopilot）` 是**共用框架目录**，只存放：
+当前目录 `本仓库根目录（devpilot）` 是**共用框架目录**，只存放：
 - 所有 Agent 定义（`.claude/agents/`）
 - 所有钩子脚本（`.claude/hooks/`）
 - 框架核心代码（`.claude-collective/`）
@@ -33,7 +33,7 @@
 | `.claude/hooks/` | 钩子脚本（SessionStart 注入规则等） |
 | `.claude/settings.json` | 项目级设置 |
 | `.claude-collective/` | 框架核心（cicd-rules.md 是规则摘要） |
-| `skills/` | Autopilot Skill 定义（13 个，含 UI/UX 设计增强） |
+| `skills/` | DevPilot Skill 定义（13 个，含 UI/UX 设计增强） |
 | `CLAUDE.md` | 项目行为规则 |
 | `README.md` | 本文件（AI 规则书） |
 | `QUICK_START.md` | 快速参考 |
@@ -667,12 +667,12 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 
 > ❓ **常见问题：如果我随便开一个 Claude Code 会话就可以使用吗？**
 > 
-> ⚠️ **答：不行。必须 `cd` 到 autopilot 目录启动 Claude Code。**
+> ⚠️ **答：不行。必须 `cd` 到 devpilot 目录启动 Claude Code。**
 > 
-> Skills 通过 install.sh 注册到 `~/.claude/skills/` 后全局可用，但**流程规则和自动触发**只在 autopilot 项目目录下生效。
+> Skills 通过 install.sh 注册到 `~/.claude/skills/` 后全局可用，但**流程规则和自动触发**只在 devpilot 项目目录下生效。
 > 
 > ```bash
-> cd 本仓库根目录（claude-code-autopilot）
+> cd 本仓库根目录（devpilot）
 > claude
 > ```
 
@@ -887,10 +887,10 @@ title {流程图标题}
 
 ### Q1: 如果我随便开一个 Claude Code 会话就可以使用吗？
 
-**A:** 必须 `cd` 到 autopilot 目录启动。Skills 虽然全局可用，但流程规则（CLAUDE.md、行为约束）只在项目目录下加载。
+**A:** 必须 `cd` 到 devpilot 目录启动。Skills 虽然全局可用，但流程规则（CLAUDE.md、行为约束）只在项目目录下加载。
 
 ```bash
-cd L:/jit/claude-code-autopilot
+cd L:/jit/devpilot
 claude
 ```
 
@@ -903,7 +903,7 @@ claude
 **A:** 可以。设计上就是**共用框架 + 多项目分离产出**，支持同时处理多个项目。
 
 **使用方式：**
-1. 始终在 autopilot 目录启动 Claude Code
+1. 始终在 devpilot 目录启动 Claude Code
 2. 处理哪个项目，就提供那个项目的路径
 3. 所有文档都输出到对应项目自己的目录下
 4. 框架目录保持干净，不会和项目文件混在一起，避免冲突

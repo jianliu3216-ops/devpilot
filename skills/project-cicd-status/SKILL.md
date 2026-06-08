@@ -1,9 +1,9 @@
 ---
 name: project-cicd-status
-description: 查看 Autopilot 智能流水线项目当前状态。别名：/project-cicd-status，实际加载 project-autopilot-status 完整内容。
+description: 查看 DevPilot 项目当前状态。别名：/project-cicd-status，实际加载 project-autopilot-status 完整内容。
 ---
 
-# Autopilot 智能流水线 - 状态（CICD 别名）
+# DevPilot - 状态（CICD 别名）
 
 > 本 Skill 是 `/project-autopilot-status` 的别名，功能完全相同，保留供老用户使用。
 > **直接执行 `/project-autopilot-status` 的完整流程**，不需要重复维护两份内容。

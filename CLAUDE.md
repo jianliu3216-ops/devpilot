@@ -1,7 +1,7 @@
-# Claude Code Autopilot 智能流水线工作规则
+# DevPilot — AI 驱动的智能开发流水线工作规则
 
 ## 优先级声明
-**根 CLAUDE.md > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 Autopilot 流程的唯一行为规则源。
+**根 CLAUDE.md > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 DevPilot 流程的唯一行为规则源。
 
 ## 流程触发规则
 - **必须先读取项目根目录的 README.md**，以 README.md 为流程的唯一事实源
@@ -60,9 +60,9 @@
 | `响应式`、`暗黑模式`、`动画`、`过渡`、`悬停`、`阴影`、`渐变`、`圆角` | `给这个组件加悬停动画效果` |
 
 **集成规则**：
-- 在 Autopilot 流程的**软件设计**阶段，涉及 UI 模块时自动调用 `ui-ux-pro-max` 获取设计建议
+- 在 DevPilot 流程的**软件设计**阶段，涉及 UI 模块时自动调用 `ui-ux-pro-max` 获取设计建议
 - 在**代码实现**阶段，编辑前端文件时自动调用 `ui-ux-pro-max` 验证和改进 UI 代码
-- 也可独立使用：`/ui-ux-pro-max` 或直接描述 UI 需求，无需走完整 Autopilot 流程
+- 也可独立使用：`/ui-ux-pro-max` 或直接描述 UI 需求，无需走完整 DevPilot 流程
 - **注意**：`ui-ux-pro-max` 的搜索脚本依赖 Python 3，如未安装则回退到内置设计知识
 
 ## 变更分级规则（全流程通用）
