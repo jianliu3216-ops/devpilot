@@ -20,13 +20,11 @@
 | `知识库更新`、`更新知识库` | 任务8.5 知识库更新 | `更新知识库` |
 | `需求变更`、`变更需求`、`需求变更：` | 任务9 需求变更 | `需求变更：user-login 增加忘记密码` |
 | `生成知识库`、`项目知识库`、`PROJECT_KNOWLEDGE_BASE` | 任务2 知识库生成 | `生成知识库，目标项目：D:\my-app` |
-| `激活DevPilot`、`启动流水线`、`devpilot` | 激活 DevPilot | `/devpilot-init` |
 
 ### 触发方式二：Skill 命令（/ 开头，可发现）
 
 | 命令 | 对应任务 |
 |------|---------|
-| `/devpilot-init` | **激活 DevPilot**（任意目录下激活流水线，无需 cd 到框架目录） |
 | `/project-knowledge-base` | 任务2 知识库生成（已内置） |
 | `/requirement-analysis` | 任务3 需求分析 |
 | `/generate-prd` | 任务4 PRD |
