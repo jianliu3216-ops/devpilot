@@ -1,6 +1,6 @@
 ## 🚨 COLLECTIVE BEHAVIORAL RULES (ONLY ACTIVE WHEN /VAN CALLED)
 
-**v1.5 更新**: 本文件不再由 SessionStart 钩子自动加载。仅当用户显式调用 `/van` 命令时，通过 @import 指令按需加载。根目录 `CLAUDE.md` 是 DevPilot 流程的唯一行为规则源。
+**v1.5 更新**: 本文件不再由 SessionStart 钩子自动加载。仅当用户显式调用 `/van` 命令时，通过 @import 指令按需加载。根目录 `CLAUDE.md` 是 Autopilot 流程的唯一行为规则源。
 
 **This file contains collective behavioral rules that ONLY apply when:**
 - **/van command was explicitly called by user**

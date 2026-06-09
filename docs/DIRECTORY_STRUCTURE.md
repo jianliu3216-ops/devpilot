@@ -1,4 +1,4 @@
-# DevPilot 框架完整目录结构
+# Autopilot 框架完整目录结构
 
 > 本文件由 README.md 抽取，供需要了解完整目录结构时参考。
 > 日常使用不需要读这个文件，README.md 已包含足够信息。
@@ -6,7 +6,7 @@
 ## 共用框架目录
 
 ```
-本仓库根目录（devpilot）\ (共用框架目录，只放框架，不放项目产出)
+本仓库根目录（claude-code-autopilot）\ (共用框架目录，只放框架，不放项目产出)
 ├── .claude/
 │   ├── agents/                             # Claude Code 自定义 Agent 定义目录
 │   │   │                                   # 每个 .md 文件定义一个 Agent 的角色和提示词
@@ -77,16 +77,15 @@
 │   ├── tests/                             → 框架自身测试
 │   └── metrics/                           → 指标数据
 │
-├── skills/                                 # Autopilot Skill 定义目录
-│   ├── project-autopilot-status/          → 查看项目状态
-│   ├── project-knowledge-base/            → 生成项目知识库
-│   ├── requirement-analysis/              → 需求分析
-│   ├── generate-prd/                      → 生成 PRD
-│   ├── software-design/                   → 软件设计
-│   ├── implement-code/                    → 代码实现
-│   ├── test-cases/                        → 测试用例
-│   ├── test-report/                       → 测试报告
-│   └── requirement-change/                → 需求变更
+├── skills/                                    # Autopilot Skill 定义目录
+│   ├── jit-devpilot-init/                    → 全局激活流水线
+│   ├── jit-env-auto-setup/                   → 环境自动检测与配置
+│   ├── jit-project-autopilot-status/         → 查看项目状态
+│   ├── jit-project-knowledge-base/           → 生成项目知识库
+│   ├── jit-ui-ux-pro-max/                    → UI/UX 智能设计
+│   └── jit-nowTimeAndModel/                  → 时间与模型
+│
+│   流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发 /van → Agent 执行
 │
 ├── docs/                                   # 框架文档
 │   ├── DIRECTORY_STRUCTURE.md             → 本文件
@@ -96,7 +95,7 @@
 ├── uninstall.sh                            → 卸载脚本
 ├── CLAUDE.md                              → 项目行为规则（SessionStart 不注入，仅本目录生效）
 ├── README.md                              → 完整使用说明（AI 规则书）
-└── QUICK_START.md                         → 快速参考
+└── 快速入门.md                             → 快速参考
 ```
 
 ## 目标项目产出目录结构

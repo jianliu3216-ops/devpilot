@@ -118,7 +118,7 @@ if ! command -v git &> /dev/null; then
 fi
 echo "✅ git: $(git --version)"
 
-# 3. Python 3（ui-ux-pro-max skill 需要，非硬性依赖）
+# 3. Python 3（jit-ui-ux-pro-max skill 需要，非硬性依赖）
 PYTHON3_AVAILABLE=false
 PYTHON3_CMD=""
 if command -v python3 &> /dev/null; then
@@ -134,7 +134,7 @@ fi
 if [ "$PYTHON3_AVAILABLE" = true ]; then
     echo "✅ Python 3: $($PYTHON3_CMD --version 2>&1)"
 else
-    echo "⚠️  未检测到 Python 3（ui-ux-pro-max 搜索功能需要）"
+    echo "⚠️  未检测到 Python 3（jit-ui-ux-pro-max 搜索功能需要）"
     echo "   安装方式：https://www.python.org/downloads/"
     echo "   或: winget install Python.Python.3.12"
     echo ""
@@ -194,7 +194,11 @@ if [ "$INSTALL_SKILLS" = true ]; then
         echo "⚠️  未找到 Skills 文件，请确认 skills/ 目录结构正确"
         pause_exit 1
     fi
-    echo "已安装 $SKILL_COUNT 个 Skills（含需求分析/PRD/设计/代码实现/测试用例/测试报告/需求变更等）"
+    echo "已安装 $SKILL_COUNT 个 Skills（流水线激活/知识库生成/状态查看/环境配置/UI设计/时间模型）"
+
+    # 记录框架路径供 jit-devpilot-init skill 使用
+    echo "$SCRIPT_DIR" > "$HOME/.claude/devpilot-framework-path"
+    echo "✅ 框架路径已记录: $SCRIPT_DIR"
 fi
 
 # --- 提示安装工具包（如果未指定 --tools 且工具包未安装） ---
@@ -322,19 +326,23 @@ echo "========================================="
 echo "  ✅ 安装完成！"
 echo "========================================="
 echo ""
-echo "使用方式（必须在 devpilot 目录下启动 Claude Code）："
-echo "  cd $SCRIPT_DIR"
-echo "  claude"
+echo "使用方式："
 echo ""
-echo "启动后看到「✅ DevPilot v$(cat "$SCRIPT_DIR/VERSION") — 就绪」表示成功。"
+echo "  方式一（推荐）：任意目录启动 Claude Code，输入 /jit-devpilot-init 激活"
+echo ""
+echo "  方式二：在框架目录下启动 Claude Code（自动激活）"
+echo "    cd $SCRIPT_DIR"
+echo "    claude"
+echo ""
+echo "启动后看到「✅ Autopilot 智能流水线 v$(cat "$SCRIPT_DIR/VERSION") — 就绪」表示成功。"
 echo ""
 echo "常用触发关键字："
 echo "  需求分析：功能描述，目标项目：D:\\my-project"
-echo "  /project-autopilot-status        → 查看项目状态"
-echo "  /requirement-analysis            → 需求分析"
-echo "  /project-knowledge-base          → 生成项目知识库"
-echo "  /generate-prd                    → 生成PRD"
-echo "  ...更多命令见 QUICK_START.md"
+echo "  /jit-project-autopilot-status        → 查看项目状态"
+echo "  /jit-project-knowledge-base          → 生成项目知识库"
+echo "  /jit-devpilot-init                   → 激活流水线"
+echo "  /jit-env-auto-setup                  → 环境检测与配置"
+echo "  ...更多命令见 快速入门.md"
 echo ""
 echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新 Skills 生效"
 echo "     重启方式：在 Claude 中输入 /exit，然后重新运行 claude"
@@ -345,7 +353,7 @@ echo "  bash install.sh --tools-only  # 只装工具包，不动 Skills"
 echo "  npm install -g @optave/codegraph  # 安装 CodeGraph（代码图谱分析）"
 if [ "$PYTHON3_AVAILABLE" = false ]; then
 echo ""
-echo "⚠️  Python 3 未安装，ui-ux-pro-max 搜索功能不可用"
+echo "⚠️  Python 3 未安装，jit-ui-ux-pro-max 搜索功能不可用"
 echo "    安装 Python 3: https://www.python.org/downloads/"
 echo "    或: winget install Python.Python.3.12"
 fi

@@ -1,6 +1,6 @@
-# DevPilot — AI 驱动的智能开发流水线
+# Autopilot 智能流水线开发流程
 
-> **导航**: [快速开始](QUICK_START.md) | [知识库规则](docs/KNOWLEDGE_BASE_RULES.md) | [安装指南](QUICK_START.md#安装)
+> **导航**: [快速开始](快速入门.md) | [知识库规则](docs/KNOWLEDGE_BASE_RULES.md) | [安装指南](快速入门.md#安装)
 
 本项目是一套基于 Claude Code 的 AI 辅助开发智能流水线，实现从简单自然语言需求 → 需求分析 → PRD → 软件设计 → 代码实现 → 测试用例 → 测试报告的全流程自动化。每个阶段产出需要人工确认后才进入下一阶段，确保质量可控。
 
@@ -8,7 +8,7 @@
 
 ## 设计思路
 
-当前目录 `本仓库根目录（devpilot）` 是**共用框架目录**，只存放：
+当前目录 `本仓库根目录（claude-code-autopilot）` 是**共用框架目录**，只存放：
 - 所有 Agent 定义（`.claude/agents/`）
 - 所有钩子脚本（`.claude/hooks/`）
 - 框架核心代码（`.claude-collective/`）
@@ -33,10 +33,10 @@
 | `.claude/hooks/` | 钩子脚本（SessionStart 注入规则等） |
 | `.claude/settings.json` | 项目级设置 |
 | `.claude-collective/` | 框架核心（cicd-rules.md 是规则摘要） |
-| `skills/` | DevPilot Skill 定义（13 个，含 UI/UX 设计增强） |
+| `skills/` | Autopilot Skill 定义（13 个，含 UI/UX 设计增强） |
 | `CLAUDE.md` | 项目行为规则 |
 | `README.md` | 本文件（AI 规则书） |
-| `QUICK_START.md` | 快速参考 |
+| `快速入门.md` | 快速参考 |
 | `install.sh` | 安装脚本 |
 
 > 完整目录结构详见 [docs/DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)
@@ -139,11 +139,11 @@ task-orchestrator (路由 Agent) 分析你的请求
   ```
   生成知识库，目标项目：D:\projects\my-existing-project
   ```
-- **工具**：直接调用您自定义的 Skill → `/project-knowledge-base`
+- **工具**：直接调用您自定义的 Skill → `/jit-project-knowledge-base`
 - **实际调用示例（框架自动执行，你不需要输入）**：
   
   ```
-  /project-knowledge-base --target "D:\projects\my-existing-project" --output "D:\projects\my-existing-project\docs\knowledge-base\PROJECT_KNOWLEDGE_BASE.md"
+  /jit-project-knowledge-base --target "D:\projects\my-existing-project" --output "D:\projects\my-existing-project\docs\knowledge-base\PROJECT_KNOWLEDGE_BASE.md"
   ```
 - **输出**：`[目标项目]/docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`
   
@@ -202,7 +202,8 @@ task-orchestrator (路由 Agent) 分析你的请求
 - **我的工作**：
   - 记住目标项目路径
   - **自动生成英文标识建议，提示你确认**（如：需求【用户登录注册模块】英文标识建议：user-login，是否需要调整？）
-  - 自动在目标项目创建 `docs/{需求标识}/` 目录（如果不存在）
+      - 标识确认后立即创建 `00-原始需求.md` + `CHANGELOG.md`（先于一切分析），同时创建 `docs/{需求标识}/` 目录
+      - 执行需求分析，自动评估变更级别并输出分级建议
   - **调用 `/van` 时，会在命令中**拼上所有依赖文件的完整绝对路径** → AI 能直接找到文件，即使新开会话也没问题
   - 如果已完成任务 2（私域知识库），完整调用示例：
     ```
@@ -667,12 +668,12 @@ AI 收到 `级别：L` 后直接走轻量流程，不再做分级分析。
 
 > ❓ **常见问题：如果我随便开一个 Claude Code 会话就可以使用吗？**
 > 
-> ⚠️ **答：不行。必须 `cd` 到 devpilot 目录启动 Claude Code。**
+> ⚠️ **答：不行。必须 `cd` 到 autopilot 目录启动 Claude Code。**
 > 
-> Skills 通过 install.sh 注册到 `~/.claude/skills/` 后全局可用，但**流程规则和自动触发**只在 devpilot 项目目录下生效。
+> Skills 通过 install.sh 注册到 `~/.claude/skills/` 后全局可用，但**流程规则和自动触发**只在 autopilot 项目目录下生效。
 > 
 > ```bash
-> cd 本仓库根目录（devpilot）
+> cd 本仓库根目录（claude-code-autopilot）
 > claude
 > ```
 
@@ -887,10 +888,10 @@ title {流程图标题}
 
 ### Q1: 如果我随便开一个 Claude Code 会话就可以使用吗？
 
-**A:** 必须 `cd` 到 devpilot 目录启动。Skills 虽然全局可用，但流程规则（CLAUDE.md、行为约束）只在项目目录下加载。
+**A:** 必须 `cd` 到 autopilot 目录启动。Skills 虽然全局可用，但流程规则（CLAUDE.md、行为约束）只在项目目录下加载。
 
 ```bash
-cd L:/jit/devpilot
+cd L:/jit/claude-code-autopilot
 claude
 ```
 
@@ -903,7 +904,7 @@ claude
 **A:** 可以。设计上就是**共用框架 + 多项目分离产出**，支持同时处理多个项目。
 
 **使用方式：**
-1. 始终在 devpilot 目录启动 Claude Code
+1. 始终在 autopilot 目录启动 Claude Code
 2. 处理哪个项目，就提供那个项目的路径
 3. 所有文档都输出到对应项目自己的目录下
 4. 框架目录保持干净，不会和项目文件混在一起，避免冲突
@@ -971,11 +972,11 @@ git reset --hard <commit-id>   # 回滚到指定提交
 
 ---
 
-### Q9: 如果我忘了用 `/project-autopilot-status`，是否每次都需要带目录？
+### Q9: 如果我忘了用 `/jit-project-autopilot-status`，是否每次都需要带目录？
 
 **A:**
 - ✅ **只要你第一次提供目标项目路径**，我就会记住，后续阶段**不需要**每次都带
-- ✅ `/project-autopilot-status` 主要用于：
+- ✅ `/jit-project-autopilot-status` 主要用于：
   1. 新开 Claude 会话后，恢复记忆告诉你当前在哪个项目
   2. 切换到另一个项目开发
   3. 忘记当前项目路径时，查看状态
