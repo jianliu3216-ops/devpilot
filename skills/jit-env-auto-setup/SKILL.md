@@ -28,7 +28,7 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
 
 2. **检测预安装的 node_modules 路径**
    - 检查路径：`$HOME/.claude/tools/node-libs/node_modules`
-   - 确认 docx、mammoth、xlsx、pdf-parse 等常用库是否已安装
+   - 确认 docx、mammoth、xlsx、pdf-parse、officeparser 等常用库是否已安装
    - 如果路径不存在，提示用户运行 `bash install.sh --tools` 安装基础工具包
 
 3. **设置 NODE_PATH 环境变量**
@@ -54,7 +54,7 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
 ✅ 环境检测完成：
 - Node.js: v20.20.0
 - NODE_PATH: $HOME/.claude/tools/node-libs/node_modules
-- 可用库: docx, mammoth, xlsx 等
+- 可用库: docx, mammoth, xlsx, officeparser 等
 - 可直接运行 Node.js 脚本，无需重复安装依赖
 ```
 

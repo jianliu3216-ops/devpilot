@@ -312,6 +312,7 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 5. **所有 PUML 使用 PlantUML 语法**，兼容在线渲染（如 plantuml.com/plantuml）
 6. **图中必须标注源码文件路径**：每个处理节点旁标注实现它的源文件名（如 `packet_handler.lua`），方便定位
 7. **每个文件头部必须包含元数据**：项目名、图类型、生成时间、激活标签
+8. **[强制] PUML 语言规则**：**所有 PUML 图的标签、标题、注释、节点描述必须使用中文**。代码文件名和类名保持原文。skinparam 元数据注释可使用英文。title 必须为中文。此规则优先级高于模板示例
 
 ---
 
@@ -364,12 +365,16 @@ skinparam ArrowColor #555555
 
 **以下字符绝对不能出现在 PUML 文件任何位置：**
 
-| 禁止字符 ❌ | 替代字符 ✅ | 说明 |
+| 禁止字符 | 替代字符 | 说明 |
 |-----------|-----------|------|
-| 所有 emoji（🔄🔌🔐⚙️🛡️★等） | 纯中文描述 | emoji 在 50% 以上渲染器中会变成乱码 |
-| 制表符（├ └ ─ │ 等） | 普通 `-` 连字符 + 纯文本 | 不同编码下制表符会变成未知字符 |
-| 全角符号（、 。 ： ；等） | 半角对应符号 | 全角标点经常导致解析器截断 |
+| 所有 emoji | 纯中文描述 | emoji 在 50% 以上渲染器中会变成乱码 |
+| 制表符 | 普通 `-` 连字符 + 纯文本 | 不同编码下制表符会变成未知字符 |
+| 全角符号 | 半角对应符号 | 全角标点经常导致解析器截断 |
 | 连续 3 个以上特殊字符 | 简化为纯文本 | 复杂符号组合极易触发解析 bug |
+| **Activity节点中的括号 `()`** | **移除或用空格分隔** | 括号在 `:text;` 标签内会被误解析为函数调用语法，导致渲染报错 |
+| **Activity节点中的方括号 `[]`** | **改为"列表"等中文描述** | 方括号会被误解析为样式或链接语法 |
+| **Activity节点中的等号 `=`** | **改为"等于"或": "** | 等号在某些解析器中触发key=value解析 |
+| **Activity节点中的 `/` 路径分隔符** | **改为`_`或空格** | 斜杠在部分渲染器中触发特殊解析 |
 
 ---
 
@@ -401,7 +406,7 @@ skinparam ArrowColor #555555
 
 ##### 六、每个 PUML 文件的标准模板（直接套用，禁止增删 skinparam）
 
-```plantuml
+```
 @startuml
 ' 项目：[项目名，纯英文，不含特殊字符]
 ' 流程图类型：[主业务流程/模块依赖/...]
@@ -411,7 +416,7 @@ skinparam ArrowColor #555555
 ' 变更记录（倒序，纯文本）：
 ' vX.X - YYYY-MM-DD - [修改内容描述]
 
-' ⚠️ 重要：只使用最通用的 plantuml 语法，确保所有版本兼容
+' 重要：只使用最通用的 plantuml 语法，确保所有版本兼容
 skinparam backgroundColor #FEFEFE
 skinparam BackgroundColor #E8F4FD
 skinparam BorderColor #2196F3
@@ -419,10 +424,10 @@ skinparam NoteBackgroundColor #FFF9C4
 skinparam NoteBorderColor #FBC02D
 skinparam ArrowColor #555555
 
-title [图标题，纯文本，不含特殊字符]
+title [图标题，必须使用中文，不含特殊字符]
 
-' [图内容]
-' ⚠️ State 图和 Activity 图语法绝对不能混用！
+' [图内容 - 所有标签、节点描述、注释必须使用中文]
+' State 图和 Activity 图语法绝对不能混用！
 ' - Activity 图安全子集：start / :xxx; / if/then/else / stop
 ' - State 图安全子集：[*] --> state / state "xxx" as s1 / note
 

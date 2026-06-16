@@ -18,7 +18,7 @@ SKILLS_DIR="$HOME/.claude/skills"
 TOOLS_DIR="$HOME/.claude/tools/node-libs"
 
 # 基础工具包列表
-TOOL_PACKAGES="docx mammoth xlsx pdf-parse markdown-docx"
+TOOL_PACKAGES="docx mammoth xlsx pdf-parse markdown-docx officeparser"
 
 # 退出前等待用户按键，防止窗口闪退
 pause_exit() {
@@ -201,16 +201,46 @@ if [ "$INSTALL_SKILLS" = true ]; then
     echo "✅ 框架路径已记录: $SCRIPT_DIR"
 fi
 
-# --- 提示安装工具包（如果未指定 --tools 且工具包未安装） ---
+# --- 检测缺失的工具包（增量更新） ---
+# 即使 node_modules 已存在，也检查是否有新增的工具包需要补装
+if [ "$INSTALL_TOOLS" = false ] && [ -d "$TOOLS_DIR/node_modules" ]; then
+    MISSING_PKGS=""
+    for pkg in $TOOL_PACKAGES; do
+        if [ ! -d "$TOOLS_DIR/node_modules/$pkg" ]; then
+            if [ -z "$MISSING_PKGS" ]; then
+                MISSING_PKGS="$pkg"
+            else
+                MISSING_PKGS="$MISSING_PKGS $pkg"
+            fi
+        fi
+    done
+    if [ -n "$MISSING_PKGS" ]; then
+        echo ""
+        echo "--- 检测到新的工具包 ---"
+        echo "已安装的工具包需要更新，以下工具尚未安装："
+        for pkg in $MISSING_PKGS; do
+            echo "  - $pkg"
+        done
+        echo ""
+        echo "是否现在补装？(y/n)"
+        read -r INSTALL_CHOICE
+        if [ "$INSTALL_CHOICE" = "y" ] || [ "$INSTALL_CHOICE" = "Y" ]; then
+            INSTALL_TOOLS=true
+        fi
+    fi
+fi
+
+# --- 提示安装工具包（如果未指定 --tools 且工具包完全未安装） ---
 if [ "$INSTALL_TOOLS" = false ] && [ ! -d "$TOOLS_DIR/node_modules" ]; then
     echo ""
     echo "--- Node.js 基础工具包 ---"
-    echo "未检测到 Node.js 工具包（docx、xlsx、pdf-parse 等）"
+    echo "未检测到 Node.js 工具包（docx、xlsx、pdf-parse、officeparser 等）"
     echo "这些工具包用于："
     echo "  - docx/markdown-docx: 生成 Word 文档"
     echo "  - xlsx: 生成 Excel 文档"
     echo "  - pdf-parse: 解析 PDF 文件"
     echo "  - mammoth: Word 文档转换"
+    echo "  - officeparser: Office 文档解析（pptx/docx/xlsx 转文本）"
     echo ""
     echo "是否现在安装？(y/n)"
     read -r INSTALL_CHOICE

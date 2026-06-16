@@ -79,7 +79,7 @@
 │
 ├── skills/                                    # Autopilot Skill 定义目录
 │   ├── jit-devpilot-init/                    → 全局激活流水线
-│   ├── jit-env-auto-setup/                   → 环境自动检测与配置
+│   ├── jit-env-auto-setup/                   → Node环境自动检测与配置使用
 │   ├── jit-project-autopilot-status/         → 查看项目状态
 │   ├── jit-project-knowledge-base/           → 生成项目知识库
 │   ├── jit-ui-ux-pro-max/                    → UI/UX 智能设计
