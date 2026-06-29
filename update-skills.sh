@@ -73,6 +73,10 @@ for skill_dir in "$SKILLS_SRC"/*/; do
 done
 shopt -u nullglob
 
+# --- 刷新框架路径 ---
+echo "$SCRIPT_DIR" > "$HOME/.claude/devpilot-framework-path"
+echo "✅ 框架路径已更新: $SCRIPT_DIR"
+
 echo ""
 echo "========================================="
 echo "  ✅ 更新完成：安装 $INSTALLED 个 Skill"

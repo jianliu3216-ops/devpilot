@@ -17,6 +17,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$HOME/.claude/skills"
 TOOLS_DIR="$HOME/.claude/tools/node-libs"
 
+# 跨平台 Node 检测库
+# shellcheck source=scripts/node-detect.sh
+source "$SCRIPT_DIR/scripts/node-detect.sh"
+
 # 基础工具包列表
 TOOL_PACKAGES="docx mammoth xlsx pdf-parse markdown-docx officeparser"
 
@@ -44,36 +48,6 @@ for arg in "$@"; do
     esac
 done
 
-# 获取 Node.js 版本的函数（兼容 Git Bash）
-get_node_version() {
-    # 方法1: 直接执行 node -v
-    local version=$(node -v 2>&1 | grep -oE 'v[0-9]+' | head -1 | sed 's/v//')
-    
-    # 如果方法1失败，尝试方法2
-    if [ -z "$version" ]; then
-        version=$(node --version 2>&1 | grep -oE 'v[0-9]+' | head -1 | sed 's/v//')
-    fi
-    
-    # 如果还是失败，尝试方法3：通过 which 找到 node.exe 直接执行
-    if [ -z "$version" ]; then
-        local node_path=$(which node 2>/dev/null)
-        if [ -n "$node_path" ] && [ -f "$node_path" ]; then
-            version=$("$node_path" -v 2>&1 | grep -oE 'v[0-9]+' | head -1 | sed 's/v//')
-        fi
-    fi
-    
-    echo "$version"
-}
-
-# 获取完整版本号的函数
-get_node_full_version() {
-    local version=$(node -v 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-    if [ -z "$version" ]; then
-        version=$(node --version 2>&1 | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-    fi
-    echo "$version"
-}
-
 echo "========================================="
 echo "  Autopilot 智能流水线 - 安装向导"
 echo "========================================="
@@ -81,34 +55,31 @@ echo ""
 
 # --- 前置检查 ---
 
-# 1. Node.js >= 18
-if ! command -v node &> /dev/null; then
+# 1. Node.js >= 18（Windows Git Bash 兼容检测）
+if ! node_detect_init; then
     echo "❌ 未检测到 Node.js，请先安装 Node.js >= 18"
     echo "   下载地址: https://nodejs.org/"
     echo "   推荐版本: 20.x LTS 或 22.x LTS"
+    echo ""
+    echo "   Windows 提示: 若已安装但仍检测不到，请确认 node 在 PATH 中"
+    echo "   PowerShell 验证: where.exe node && node -v"
     pause_exit 1
 fi
-# 获取 Node.js 版本
-NODE_MAJOR=$(get_node_version)
-NODE_FULL=$(get_node_full_version)
 
-if [ -z "$NODE_MAJOR" ]; then
-    echo "⚠️  警告: 无法自动检测 Node.js 版本号"
-    echo "   检测到的输出:"
-    node -v 2>&1
-    
-    echo ""
-    echo "   请手动确认 Node.js 版本 >= 18"
-    echo "   当前命令: node -v"
+echo "   检测路径: $NODE_CMD"
+
+if [ -z "$NODE_SEMVER" ]; then
+    echo "⚠️  警告: 无法解析 Node.js 版本号（node -p process.versions.node 失败）"
+    run_node -v 2>&1 || true
     echo ""
     echo "   按回车继续安装（假设版本符合要求），或 Ctrl+C 取消..."
     read -r
-elif [ "$NODE_MAJOR" -lt 18 ] 2>/dev/null; then
+elif ! version_ge "$NODE_SEMVER" "18.0.0"; then
     echo "❌ Node.js 版本过低: $NODE_FULL，需要 >= 18"
     echo "   推荐升级到: 20.x LTS 或 22.x LTS"
     pause_exit 1
 else
-    echo "✅ Node.js: ${NODE_FULL:-v$NODE_MAJOR.?.?}"
+    echo "✅ Node.js: $NODE_FULL"
 fi
 
 # 2. git
@@ -124,8 +95,14 @@ PYTHON3_CMD=""
 if command -v python3 &> /dev/null; then
     PYTHON3_CMD="python3"
     PYTHON3_AVAILABLE=true
+elif command -v py &> /dev/null; then
+    py_ver=$(py -3 --version 2>&1 | grep -oE 'Python 3\.' | head -1)
+    if [ -n "$py_ver" ]; then
+        PYTHON3_CMD="py -3"
+        PYTHON3_AVAILABLE=true
+    fi
 elif command -v python &> /dev/null; then
-    local py_ver=$(python --version 2>&1 | grep -oE 'Python 3\.' | head -1)
+    py_ver=$(python --version 2>&1 | grep -oE 'Python 3\.' | head -1)
     if [ -n "$py_ver" ]; then
         PYTHON3_CMD="python"
         PYTHON3_AVAILABLE=true
@@ -151,7 +128,7 @@ if ! type claude &> /dev/null; then
     read -r INSTALL_CLAUDE
     if [ "$INSTALL_CLAUDE" = "y" ] || [ "$INSTALL_CLAUDE" = "Y" ]; then
         echo "正在安装 Claude Code CLI..."
-        npm install -g @anthropic-ai/claude-code
+        run_npm install -g @anthropic-ai/claude-code
         if ! type claude &> /dev/null; then
             echo "❌ Claude Code 安装失败，请手动执行："
             echo "   npm install -g @anthropic-ai/claude-code"
@@ -194,7 +171,7 @@ if [ "$INSTALL_SKILLS" = true ]; then
         echo "⚠️  未找到 Skills 文件，请确认 skills/ 目录结构正确"
         pause_exit 1
     fi
-    echo "已安装 $SKILL_COUNT 个 Skills（流水线激活/知识库生成/状态查看/环境配置/UI设计/时间模型）"
+    echo "已安装 $SKILL_COUNT 个 Skills（流水线激活 / 知识库 / 知识库更新 / 状态 / 环境 / UI / 时间模型）"
 
     # 记录框架路径供 jit-devpilot-init skill 使用
     echo "$SCRIPT_DIR" > "$HOME/.claude/devpilot-framework-path"
@@ -263,7 +240,7 @@ if [ "$INSTALL_TOOLS" = true ]; then
     # 安装工具包
     echo "正在安装: $TOOL_PACKAGES"
     cd "$TOOLS_DIR"
-    npm install --save $TOOL_PACKAGES 2>&1 | tail -5
+    run_npm install --save $TOOL_PACKAGES 2>&1 | tail -5
     cd "$SCRIPT_DIR"
 
     # 验证安装
@@ -273,7 +250,7 @@ if [ "$INSTALL_TOOLS" = true ]; then
         echo "验证已安装的包："
         for pkg in $TOOL_PACKAGES; do
             if [ -d "$TOOLS_DIR/node_modules/$pkg" ]; then
-                VERSION=$(node -e "console.log(require('$TOOLS_DIR/node_modules/$pkg/package.json').version)" 2>/dev/null || echo "?")
+                VERSION=$(run_node -e "console.log(require('$TOOLS_DIR/node_modules/$pkg/package.json').version)" 2>/dev/null || echo "?")
                 echo "  ✅ $pkg@$VERSION"
             else
                 echo "  ❌ $pkg 未安装成功"
@@ -284,70 +261,28 @@ if [ "$INSTALL_TOOLS" = true ]; then
     fi
 fi
 
-# --- 提示安装 CodeGraph（可选） ---
-# 用 npm ls 判断包是否真正安装，避免残留 bin 文件误判
-if ! npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
-    echo ""
-    echo "--- 推荐工具：CodeGraph（代码图谱分析） ---"
-    echo "CodeGraph 可辅助知识库生成、变更影响分析、死代码检测等"
-    echo "与 Autopilot 流程深度协同，但不是必装依赖"
-    echo ""
-
-    # --- CodeGraph 安装前置检查 ---
-    # 复用前面已检测的 NODE_MAJOR / NODE_FULL，不再重复查询
-    CODEGRAPH_CAN_INSTALL=true
-    CODEGRAPH_NODE_MAJOR="$NODE_MAJOR"
-    CODEGRAPH_NODE_MINOR=$(echo "$NODE_FULL" | cut -d. -f2)
-
-    # 1. Node.js 版本检查 (CodeGraph 需要 >= 22.6)
-    if [ -z "$NODE_FULL" ]; then
-        echo "❌ 未检测到 Node.js，CodeGraph 需要 Node.js >= 22.6"
-        CODEGRAPH_CAN_INSTALL=false
-    elif [ "$CODEGRAPH_NODE_MAJOR" -lt 22 ] 2>/dev/null; then
-        echo "⚠️  当前 Node.js: $NODE_FULL，CodeGraph 需要 >= 22.6"
-        echo "   请先升级 Node.js 22+ 再安装 CodeGraph"
-        echo "   下载地址: https://nodejs.org (推荐 22.x LTS)"
-        CODEGRAPH_CAN_INSTALL=false
-    elif [ "$CODEGRAPH_NODE_MAJOR" -eq 22 ] && [ "$CODEGRAPH_NODE_MINOR" -lt 6 ] 2>/dev/null; then
-        echo "⚠️  当前 Node.js: $NODE_FULL，CodeGraph 需要 >= 22.6"
-        echo "   请升级到 Node.js 22.6+ 或 23+"
-        CODEGRAPH_CAN_INSTALL=false
-    fi
-
-    # 2. better-sqlite3 编译环境检查 (Windows)
-    if [ "$CODEGRAPH_CAN_INSTALL" = true ] && uname -s 2>/dev/null | grep -qi "mingw\|msys\|cygwin"; then
-        # prebuild-install 会优先下载预编译二进制，若网络失败回退到 node-gyp 编译
-        # 这里只做提示，不阻塞安装
-        if ! command -v node-gyp &> /dev/null && ! ls "C:/Program Files/Microsoft Visual Studio"* &> /dev/null && ! ls "C:/Program Files (x86)/Microsoft Visual Studio"* &> /dev/null; then
-            echo "💡 提示: 未检测到 Visual Studio C++ 工具链"
-            echo "   better-sqlite3 有预编译二进制，通常无需 VS。"
-            echo "   如果安装失败，可安装 Visual Studio 2022 Build Tools"
-            echo "   勾选「Desktop development with C++」工作负载"
-        fi
-    fi
-
-    if [ "$CODEGRAPH_CAN_INSTALL" = false ]; then
-        echo ""
-        echo "⏭️  跳过 CodeGraph 安装（环境不满足）"
-    else
-        echo "是否安装 CodeGraph？(y/n)"
-        read -r INSTALL_CODEGRAPH
-        if [ "$INSTALL_CODEGRAPH" = "y" ] || [ "$INSTALL_CODEGRAPH" = "Y" ]; then
-            echo "正在安装 @optave/codegraph..."
-            npm install -g @optave/codegraph 2>&1
-            echo ""
-            # Verify: check npm ls confirms package installed
-            if npm ls -g @optave/codegraph --depth=0 &> /dev/null; then
-                echo "✅ CodeGraph 安装成功"
-            elif [ -f "$(npm prefix -g 2>/dev/null)/codegraph" ] || [ -f "$(npm prefix -g 2>/dev/null)/codegraph.cmd" ]; then
-                echo "✅ CodeGraph 安装成功"
-            else
-                echo "⚠️  CodeGraph 安装失败"
-                echo "   可能原因: 网络问题导致预编译二进制下载失败，且缺少 VS C++ 编译环境"
-                echo "   手动重试: npm install -g @optave/codegraph"
-            fi
-        fi
-    fi
+# --- CodeGraph 检测（可选，不自动安装） ---
+# CodeGraph 是可选加速工具，install.sh 不替用户安装
+# 原因：Windows 上 better-sqlite3 native 编译常失败，自动安装会留下损坏安装
+# 用户如需安装，见 docs/CodeGraph 安装指南.md
+CODEGRAPH_MIN="22.12.0"
+echo ""
+echo "--- 可选工具：CodeGraph（代码图谱分析） ---"
+if codegraph_installed; then
+    CG_PREFIX=$(run_npm prefix -g 2>/dev/null | strip_crlf)
+    CG_CLI="$CG_PREFIX/node_modules/@optave/codegraph/dist/cli.js"
+    CG_VER=$(run_node "$CG_CLI" --version 2>/dev/null | strip_crlf)
+    echo "✅ CodeGraph 已就绪: ${CG_VER:-未知版本}"
+    echo "   知识库生成 / 变更分析时将自动调用 codegraph build"
+elif codegraph_broken_install; then
+    echo "⚠️  检测到 CodeGraph 已安装但 CLI 不可用（native binding 失败或损坏）"
+    echo "   如需修复，见 docs/CodeGraph 安装指南.md"
+    echo "   不影响 Autopilot 流程，知识库 Skill 会跳过 codegraph 改用全量扫描"
+else
+    echo "ℹ️  未安装 CodeGraph（可选加速工具，不安装不影响流程）"
+    echo "   作用：知识库生成加速 70-80%、变更影响精确分析、死代码检测"
+    echo "   如需安装：npm install -g @optave/codegraph（需 Node >= $CODEGRAPH_MIN）"
+    echo "   Windows 安装常见问题见 docs/CodeGraph 安装指南.md"
 fi
 
 # --- 完成 ---
@@ -378,9 +313,10 @@ echo "⚠️  如果 Claude Code 已在运行，需要重启会话使新 Skills 
 echo "     重启方式：在 Claude 中输入 /exit，然后重新运行 claude"
 echo ""
 echo "补充命令："
+echo "  bash update-skills.sh           # 框架升级后同步 jit-* Skills（备份旧版后重装）"
 echo "  bash install.sh --tools       # 补装 Node.js 工具包（docx/xlsx 等）"
 echo "  bash install.sh --tools-only  # 只装工具包，不动 Skills"
-echo "  npm install -g @optave/codegraph  # 安装 CodeGraph（代码图谱分析）"
+echo "  # CodeGraph 可选安装见 docs/CodeGraph 安装指南.md（install.sh 不自动安装）"
 if [ "$PYTHON3_AVAILABLE" = false ]; then
 echo ""
 echo "⚠️  Python 3 未安装，jit-ui-ux-pro-max 搜索功能不可用"

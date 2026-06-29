@@ -1,6 +1,8 @@
 # DevPilot（AI 研发领航）— 研发流程自动化解决方案
 
 > 汇报完整版 · 每页 = 一页 PPT 的内容
+>
+> 注意：本文为历史汇报材料，不是当前执行规则源。当前执行规则以根目录 `CLAUDE.md`、`README.md`、`docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 和各 `jit-*` Skill 为准。当前版本测试范围仅支持单元测试；集成测试、E2E、Playwright 属于后续版本规划。
 
 ---
 
@@ -308,7 +310,7 @@ P0 · 基础增强                  P1 · 系统集成                P2 · 深�
 | RAG 第二步 | 对接 Confluence/Wiki API → 检索历史 PRD 和架构决策；对接数据库 Schema → 理解表结构 | AI 分析需求时自动检索"有没有类似需求做过""数据库里这个字段是什么类型" |
 | 架构图交互 | PUML → Mermaid + click，模块节点可跳转源码、看 commit 历史、关联需求标识 | 架构图从静态图片变成活的系统地图 |
 | Jira 双向集成 | 流水线状态自动同步 Jira（创建 Story / 更新状态 / 追加 comment） | PM 在 Jira 上实时看到研发进度，不再断层 |
-| Web/UI 测试 | 集成 Playwright，前端项目自动跑页面回归测试 | 前端改动后自动截图对比基线，发现 UI 异常 |
+| Web/UI 测试（未来版本） | 集成 Playwright，前端项目自动跑页面回归测试 | 前端改动后自动截图对比基线，发现 UI 异常 |
 
 **P2 · Q3-Q4（战略储备）**
 
@@ -544,13 +546,14 @@ DevPilot 不是"自定义了几个 Claude Code Skill"，而是一套完整的四
 | @component-implementation-agent | UI 组件 + TDD | 代码实现 |
 | @feature-implementation-agent | 业务逻辑 + TDD | 代码实现 |
 | @infrastructure-implementation-agent | 构建系统 + TDD | 代码实现 |
-| @testing-implementation-agent | 测试套件 | 测试用例 |
+| @testing-implementation-agent | 任务6 单元测试（3–5 条/模块） | 代码实现 |
 | @polish-implementation-agent | 性能优化 | 代码实现 |
 | @quality-agent | 代码审查 + 安全分析 | 测试报告 |
 | @devops-agent | 部署 + CI/CD | 构建部署 |
-| @functional-testing-agent | Playwright 浏览器测试 | 测试用例 |
+| @functional-testing-agent | Playwright 浏览器测试（未来版本） | 测试用例 |
 | @research-agent | Context7 技术调研 | 需求分析/设计 |
-| @prd-research-agent | PRD -> 任务生成 | PRD |
+| @prd-generation-agent | DevPilot 任务4：生成 02-prd.md | PRD |
+| @prd-research-agent | Collective：PRD -> TaskMaster 任务（非 DevPilot 任务4） | PRD 研究 |
 | @task-orchestrator | 任务协调并行 | 全流程 |
 
 ---

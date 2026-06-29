@@ -81,7 +81,7 @@ NEXT: [Next coordination step or completion]
 2. Route to @infrastructure-implementation-agent for project setup  
 3. Route to @feature-implementation-agent for API and auth logic
 4. Route to @component-implementation-agent for React UI
-5. Route to @testing-implementation-agent for integration tests
+5. Route to @testing-implementation-agent for smoke tests (task 6, 3–5 per module)
 6. Return "WORKFLOW COMPLETE" with coordination summary
 
 **I coordinate the workflow, agents do the work, delegator gets results!**

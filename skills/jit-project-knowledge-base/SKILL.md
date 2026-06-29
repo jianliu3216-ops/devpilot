@@ -14,7 +14,7 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 执行本 Skill 前：
 1. 读取同级目录 `reference.md` → 了解各表格的字段标准
 2. 读取同级目录 `examples.md` → 了解最终输出的结构示例
-3. **推荐**：如果项目安装了 CodeGraph (`npm install -g @optave/codegraph`)，先在目标项目执行 `codegraph build` 预生成依赖图谱，可以大幅提升 Phase 1-2 的模块分析准确性、减少 AI 手动扫描的上下文消耗
+3. **CodeGraph（若已安装则 MUST 执行）**：检测 `codegraph --version`；可用时在目标项目根目录执行 `codegraph build`，将 `.codegraph/` 产出作为 Phase 1–2 模块依赖分析的优先输入（见下方 Phase 0.2）
 
 严格遵循 `reference.md` 的字段定义输出。
 
@@ -27,7 +27,7 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 1. 项目根目录绝对路径
 2. 允许读取的范围/是否可全量检索
 3. 输出语言（默认中文）
-4. 输出文件路径（默认：项目根目录 `/PROJECT_KNOWLEDGE_BASE.md`，允许用户指定如 `docs/PROJECT_KNOWLEDGE_BASE.md`）
+4. 输出文件路径（默认：项目根目录 `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md` + `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`，允许用户指定其他 `docs/knowledge-base/` 下路径）
 5. **期望深度**（三选一，默认：标准完整）：
    - `快速骨架` → 仅 BASE 精简版，不含 DETAIL，适合超大项目快速入门
    - `标准完整` → **双文件结构**（推荐默认）：
@@ -46,6 +46,8 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 ### Phase 0 - 范围与边界
 
 - 评估项目规模与预期深度
+- **大项目判定（MUST）**：若满足任一条件，默认进入“大项目模式”：自有源码文件数 > 500、仓库体积 > 100MB、多模块/monorepo、或用户选择“标准完整/尽量详尽”
+- **大项目模式下 CodeGraph 优先**：必须先尝试 CodeGraph 预扫描；成功后以 `.codegraph/` 作为 Phase 1–2 的优先输入，禁止直接进入无范围全量源码读取
 - **自动检测构建系统**：
   - 找到 `pom.xml` → Maven 项目 (Java/Kotlin)
   - 找到 `build.gradle` / `build.gradle.kts` → Gradle 项目 (Java/Kotlin)
@@ -57,6 +59,33 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
   - 多个构建文件 → 向用户确认主构建文件
 - 判断架构风格（单体 / 多模块 /  monorepo / 微服务聚合）
 - 记录假设与限制（未能构建、证据缺失、权限不足、部分目录无法扫描等）
+
+#### Phase 0.2 - CodeGraph 预扫描（CLI 可用时 MUST）
+
+```bash
+# 在目标项目根目录执行
+codegraph --version          # 不可用则跳过本阶段
+codegraph build              # 生成 .codegraph/ 依赖图谱
+```
+
+**使用规则**：
+- `codegraph build` 成功 → Phase 1–2 **优先**读取 `.codegraph/` 中的模块/依赖/调用关系，减少全量 grep
+- 大项目中 `codegraph` 不可用 / build 失败 → 必须输出降级说明，并改为“索引优先 + 分模块深扫”：先目录/构建/入口/依赖索引，再按用户确认的模块域逐步读取源码
+- 小项目中 `codegraph` 不可用 → 可回退手动扫描，在文档中注明「未使用 CodeGraph」
+- 可选深化：`codegraph fn-impact <函数>`（变更场景）、`codegraph dead-code`（重构建议）
+- Windows 安装失败：见 `docs/CodeGraph 安装指南.md`（需 Node >= 22.12.0）
+
+#### Phase 0.3 - 知识库结构校验（生成后 MUST）
+
+知识库生成完成后执行：
+
+```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>"
+```
+
+校验结果必须写入交付说明。若存在 Error，知识库不算完成；若大项目缺少 `.codegraph/`，必须解释原因并记录降级策略。
+
+---
 
 #### Phase 0.1 - 项目特征标签（自动检测 + 用户多选组合）
 
@@ -640,6 +669,29 @@ docs/knowledge-base/
 15. **状态机详解**（如有 🔄 OTA/热更新 / ⏰ 定时任务标签）
 16. **进程守护机制**（如有 🛡️ 进程守护标签）
 17. **打包发布流程**
+18. **需求索引**：首次生成时也必须创建空表，后续任务 8.5 追加/更新
+19. **函数与接口变更索引**：首次生成时创建空表，后续按需求增量维护
+20. **更新记录**：首次生成写入 `v1.0` 全量创建记录
+
+初始化模板：
+
+```markdown
+## 需求索引
+
+| 需求标识 | 中文名 | 级别 | 涉及模块 | 完成版本 | 状态 | 备注 |
+|---------|-------|:--:|---------|:--:|------|------|
+
+## 函数与接口变更索引
+
+| 模块 | 符号/接口 | 文件路径 | 变更类型 | 摘要 | 调用方/消费者 | 风险 | 需求标识 | 版本 |
+|------|----------|----------|----------|------|---------------|------|----------|------|
+
+## 更新记录
+
+| 版本 | 日期 | 需求标识 | 变更范围 | 说明 | 更新文件 |
+|------|------|----------|----------|------|----------|
+| v1.0 | YYYY-MM-DD | initial | 全量创建 | 初始知识库 | BASE, DETAIL |
+```
 
 ---
 
@@ -702,6 +754,9 @@ docs/knowledge-base/
 - [ ] BASE 中有模块精简字典（每个模块附带关键源文件清单）
 - [ ] DETAIL 中有全量 Util/Helper 索引（递归搜索所有子目录）
 - [ ] DETAIL 中有脚本与配置资产全索引（基于实际文件内容描述）
+- [ ] DETAIL 中已初始化 `## 需求索引`
+- [ ] DETAIL 中已初始化 `## 函数与接口变更索引`
+- [ ] DETAIL 中已初始化 `## 更新记录`，且包含 `v1.0` 全量创建记录
 - [ ] **Phase 4.1.1 配置交叉引用解析已执行**（每个被引用的配置文件都已实际读取，核心数据已提取到知识库，不能只在表格中写一句描述）
 - [ ] **配置读取验证表已填写并全部通过**（所有"被引用文件是否已读取"列都是 ✅）
 - [ ] BASE 中有重构建议（有证据、可落地）

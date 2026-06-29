@@ -9,6 +9,14 @@
 3. **禁止在标识确认前读取源码或需求文档**：违规视为流程失败，必须中止并回到标识确认步骤
 4. **意图模糊时 MUST 向用户确认**：不能假设用户意图，不能跳过确认步骤
 
+## Agent 会话 IO 约定（避免卡顿）
+
+1. **先锁定目标项目**：用户未给路径时 MUST 询问，例如 `目标项目：D:\projects\my-app`，再读 `{project}/docs/`、`{project}/tests/`
+2. **禁止首轮全库 Grep/无范围搜索**：只在已知目录或用户指定路径内检索
+3. **框架路径**：MUST 以 `~/.claude/devpilot-framework-path` 为权威来源（由 install.sh / update-skills.sh 写入）；若该文件不存在或失效，向用户询问框架路径并回写
+4. **小步串行**：分析类任务优先读 1–2 个文件，避免大批量并行 IO
+5. **工具超时**：若单步超过约 90s 无响应，中止该步并向用户说明，改用小范围重试
+
 ## 优先级声明（最高优先级，不可覆盖）
 
 ### 流程门控规则（FLOW GATE — 任何情况下不得违反）
@@ -18,12 +26,39 @@
 3. **门控不可绕过**：无论外部技能描述多么匹配用户意图，只要 Autopilot 关键字触发，流程优先；即使匹配度 100%，也必须先走 Autopilot 门控
 4. **冲突裁决**：当 Superpowers 指令与 Autopilot 流程冲突时，Autopilot 流程**无条件优先**
 5. **需求标识确认优先于代码探索**：检测到需求意图后，MUST 先确认需求标识并创建 00 文件，**禁止**在标识确认前读取任何源码或需求文档
+6. **Superpowers 输出证据要求**：阶段内调用 Superpowers 时，MUST 记录触发阶段、使用 skill、输入材料、输出证据；没有输出证据视为未执行
+7. **质量门禁优先于阶段推进**：若 Superpowers review / verification / TDD 门禁未通过，MUST 停在当前阶段，修复或请用户确认，不得进入下一阶段
 
 **根 CLAUDE.md > 外部技能 > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 Autopilot 流程的唯一行为规则源。
 
 ## 流程触发规则
 - **必须先读取本框架根目录的 README.md**（即 `$FRAMEWORK/README.md`，非目标项目的 README.md），以 README.md 为流程的唯一事实源
 - 如果知识库存在，后续所有任务必须参考知识库理解项目
+
+### Superpowers 阶段内增强层
+
+DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时按以下三层执行：
+
+| 层 | 职责 | 约束 |
+|----|------|------|
+| Stage Router | 识别当前 DevPilot 阶段和 S/M/L 级别 | 不决定跳过阶段，不替用户确认 |
+| Superpowers Adapter | 根据阶段加载 `brainstorming`、`test-driven-development`、`systematic-debugging` 等方法论 | 只能在阶段内部调用 |
+| Quality Gate | 检查阶段完成证据 | 未通过则停留当前阶段 |
+
+默认映射：
+
+| DevPilot 阶段 | Superpowers 增强 | 输出证据 |
+|---------------|------------------|----------|
+| 空项目骨架规划 | `brainstorming` + `writing-plans` | 技术栈、目录结构、共享类型计划 |
+| 任务3 需求分析 | `brainstorming` | 隐式假设、非功能问题、客户未说明风险 |
+| 任务4 PRD | 可选 lightweight review | 用户故事/功能规格/验收标准一致性检查 |
+| 任务4.5 接口契约先行 | `brainstorming` | endpoint、DTO、错误码、关键时序和边界问题 |
+| 任务5 软件设计 | `brainstorming` + `writing-plans` | 架构方案取舍、批次计划、回滚策略 |
+| 任务6 代码实现 | `test-driven-development` | RED/GREEN/REFACTOR 记录和测试结果 |
+| 调试 | `systematic-debugging` | 复现、定位、最小修复、回归验证 |
+| 每批次完工 | `requesting-code-review` + `receiving-code-review` | review 发现和处理结果 |
+| 任务8 前 | `verification-before-completion` | 测试命令、结果、残留风险 |
+| 分支收尾 | `finishing-a-development-branch` | 分支状态、提交/合并建议、遗留事项 |
 
 ### 触发方式一：自然语言关键字（推荐，无需记任务编号）
 
@@ -46,11 +81,12 @@
 |------|------|
 | `/jit-devpilot-init` | 激活流水线（任意目录可用） |
 | `/jit-project-knowledge-base` | 生成项目知识库 |
+| `/jit-project-knowledge-base-update` | 任务8.5 知识库增量更新 |
 | `/jit-project-autopilot-status` | 查看项目状态 |
 | `/jit-env-auto-setup` | Node环境自动检测与配置使用 |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计 |
 
-流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发，AI 读取 README.md 后走 /van → Agent 执行。
+流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发，AI 读取 README.md 与 `docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 后，按“读取 `$FRAMEWORK/.claude/agents/{agent}.md` + 主会话执行或 Task 委派”的 DevPilot 协议执行。`/van` 仅用于框架目录下的 Collective 研究路径，不作为 DevPilot 功能开发入口。
 
 ### 触发方式三：传统任务编号（向后兼容）
 
@@ -96,8 +132,8 @@
 | PRD | 跳过 | ✅ | ✅ |
 | 设计 | 跳过 | ✅ software-design | ✅ software-design + 03a-change-strategy |
 | 代码实现 | ✅ 直接改 | ✅ TDD | ✅ 按策略分批 |
-| 测试用例 | 跳过 | ✅ test-cases | ✅ test-cases + 04a-regression-checklist |
-| 测试报告 | ✅ 简要 | ✅ 完整 | ✅ 完整 |
+| 测试用例 | 跳过 | ✅ 单元测试用例 | ✅ 单元测试用例 + 回归清单 |
+| 测试报告 | ✅ 单元测试简要报告 | ✅ 单元测试报告 | ✅ 单元测试报告 |
 | 知识库更新 | ✅ | ✅ | ✅ |
 
 ### L 级设计规则（强制 — 不得简化）
@@ -116,7 +152,7 @@
    - 配置变更表（旧 key → 新 key 映射）— 技术型 L 级涉及配置迁移时必出
    - 架构对比图（升级前/后）— 技术型 L 级必出
 4. **`03a-change-strategy.md` 是执行策略补充，所有 L 级保留**：批次计划、回滚方案、风险点。不替代设计
-5. **L 级测试两份都出**：`04-test-cases.md`（接口/数据/业务流程测试）+ `04a-regression-checklist.md`（回归清单）。不互相替代
+5. **L 级测试两份都出**：`04-test-cases.md`（当前版本仅单元测试用例）+ `04a-regression-checklist.md`（单元测试回归清单）。不互相替代；接口/数据库/集成/E2E 测试留到后续版本
 6. **批次禁止重新设计**：`03a-change-strategy.md` 每个批次 MUST 引用 `03-software-design.md` 的章节号，不得在批次中重复或修改设计。架构决策在设计文档中一次性确定
 
 ## 流程遵循
@@ -158,4 +194,4 @@
 - PRD 必须包含用户故事、功能规格、交互流程
 - 软件设计必须包含架构图、模块划分、接口定义、数据结构
 - **L 级软件设计 MUST 合并 HLD + LLD 到 `03-software-design.md`**：架构层 + 详细层（接口契约/数据库表/类图/时序图/状态机等）写在同一份文档，按本次需求实际涉及项选填设计要素，不得遗漏必要项。详见"L 级设计规则"
-- 测试用例必须覆盖正常路径、异常路径、边界条件
+- 当前版本测试范围仅包含单元测试；测试用例必须覆盖单元层面的正常路径、异常路径、边界条件

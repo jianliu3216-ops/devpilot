@@ -10,10 +10,24 @@
 1. 匹配到 Autopilot 关键字（需求/PRD/设计/代码实现/测试/需求变更）→ **必须先进入 Autopilot 流水线**，外部 Skill 不得抢占
 2. 外部技能只能在阶段**内部**被调用，禁止替代流水线入口
 3. Autopilot 流程 **无条件优先** 于 Superpowers 或任何外部技能匹配
+4. 阶段内调用 Superpowers MUST 记录：触发阶段、使用 skill、输入材料、输出证据
+5. Superpowers review / TDD / verification 门禁未通过时，MUST 停留当前阶段，不得进入下一阶段
 
 > 优先级：**根 CLAUDE.md > 外部技能 > cicd-rules.md > 其他规则文件**
 
-### 1.1 流程门控反模式与禁止行为（FLOW GATE ANTI-PATTERNS）
+### 1.1 Superpowers 阶段内增强映射
+
+| DevPilot 阶段 | 可叠加 Superpowers | 必需证据 |
+|---------------|-------------------|----------|
+| 任务3 需求分析 | brainstorming | 隐式假设、非功能需求、风险问题清单 |
+| 任务4.5 接口契约先行 | brainstorming | endpoint、DTO、错误码、关键时序 |
+| 任务5 软件设计 | brainstorming + writing-plans | 方案取舍、批次计划、回滚策略 |
+| 任务6 代码实现 | test-driven-development | RED/GREEN/REFACTOR 和测试结果 |
+| 调试 | systematic-debugging | 复现、定位、修复、回归验证 |
+| 每批次完工 | requesting-code-review + receiving-code-review | review 结论和处理记录 |
+| 任务8 前 | verification-before-completion | 测试命令、结果、残留风险 |
+
+### 1.2 流程门控反模式与禁止行为（FLOW GATE ANTI-PATTERNS）
 
 **以下行为在需求标识确认前绝对禁止：**
 
@@ -39,14 +53,14 @@
 
 | 关键字 | 触发任务 | 说明 |
 |-------|---------|------|
-| `需求：` `需求 ` `需求分析` `需求分析：` `分析需求` | 任务3 需求分析 | 读取 README.md → /van → Agent |
+| `需求：` `需求 ` `需求分析` `需求分析：` `分析需求` | 任务3 需求分析 | 读取 README.md + DevPilot 委派指南 → 读 Agent 文件执行 |
 | `生成PRD` `PRD` | 任务4 PRD | 同上 |
 | `软件设计` `变更策略` | 任务5 设计 | 同上 |
 | `代码实现` `开始编码` | 任务6 代码实现 | 同上 |
 | `测试用例` `回归验证` | 任务7 测试用例 | 同上 |
 | `测试报告` `运行测试` | 任务8 测试报告 | 同上 |
 | `需求变更` `变更需求` `需求变更：` | 任务9 需求变更 | 同上 |
-| `知识库更新` `更新知识库` | 任务8.5 知识库更新 | 增量更新，不全量重扫 |
+| `知识库更新` `更新知识库` | 任务8.5 知识库更新 | 走 jit-project-knowledge-base-update |
 | `生成知识库` `项目知识库` `PROJECT_KNOWLEDGE_BASE` | 任务2 知识库 | 走 jit-project-knowledge-base |
 | `查看状态` | 项目状态 | 走 jit-project-autopilot-status |
 | `激活DevPilot` `启动流水线` `devpilot` | 激活 DevPilot | 走 jit-devpilot-init |
@@ -206,7 +220,8 @@ AI:   [目标项目 D:\my-app 已记住] 需求标识建议：user-login...
 - `codegraph build` — 预生成依赖图，提升模块分析准确性
 - `codegraph fn-impact <函数>` — 精确计算变更影响半径
 - `codegraph dead-code` / `codegraph check` — 死代码检测 / CI门禁
-- 安装：`npm install -g @optave/codegraph`（非必装，但有它协同效果更好）
+- 安装：`npm install -g @optave/codegraph`（非必装，Node >= 22.12.0；知识库 Skill 在 CLI 可用时会自动 `codegraph build`）
+- Windows 安装失败/残留修复：见 [docs/CodeGraph 安装指南.md](../docs/CodeGraph 安装指南.md)
 
 ## 11. 需求-知识库双向关联规则（MANDATORY）
 

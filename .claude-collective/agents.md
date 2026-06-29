@@ -4,7 +4,12 @@
 - **@component-implementation-agent** - UI components with TDD, modern framework research integration
 - **@feature-implementation-agent** - Business logic with TDD, API research patterns
 - **@infrastructure-implementation-agent** - Build systems with TDD, tooling research
-- **@testing-implementation-agent** - Comprehensive test suites with TDD methodology
+- **@requirements-analysis-agent** - DevPilot task3 requirements analysis
+- **@prd-generation-agent** - DevPilot task4 PRD → `docs/{id}/02-prd.md`（目标项目说 `生成PRD`）
+- **@software-design-agent** - DevPilot task5 design
+- **@code-implementation-agent** - DevPilot task6 TDD implementation
+- **@change-request-agent** - DevPilot task9 change requests
+- **@testing-implementation-agent** - DevPilot task6 smoke tests only (3-5 per module)
 - **@polish-implementation-agent** - Performance optimization with TDD quality approach
 
 ## ⚡ QUALITY & VALIDATION SPECIALISTS
@@ -14,7 +19,7 @@
 
 ## 💻 RESEARCH & COORDINATION
 - **@research-agent** - Context7-powered technical research and documentation
-- **@prd-research-agent** - Research-backed task generation from PRD documents
+- **@prd-research-agent** - Collective: PRD → TaskMaster tasks（非 DevPilot 任务4）
 - **@task-orchestrator** - TaskMaster-driven task coordination and parallelization
 
 ## 🧠 SPECIALIZED AGENTS

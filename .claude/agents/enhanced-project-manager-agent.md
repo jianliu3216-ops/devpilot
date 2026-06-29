@@ -72,7 +72,7 @@ mcp__task-master__get_tasks --projectRoot=PROJECT_ROOT
 # Infrastructure tasks → Task(subagent_type="infrastructure-implementation-agent")
 # Feature tasks → Task(subagent_type="feature-implementation-agent")
 # Component tasks → Task(subagent_type="component-implementation-agent")
-# Testing tasks → Task(subagent_type="testing-implementation-agent")
+# Testing smoke (task 6) → Task(subagent_type="testing-implementation-agent")
 ```
 
 **Phase 4: Progress Tracking**

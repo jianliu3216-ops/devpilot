@@ -15,7 +15,9 @@ description: 在任何目录下激活 Autopilot 智能开发流水线。加载�
 
 1. `$FRAMEWORK/CLAUDE.md`
 2. `$FRAMEWORK/.claude-collective/cicd-rules.md`
-3. `$FRAMEWORK/README.md`（按需查阅关键章节）
+3. `$FRAMEWORK/docs/KNOWLEDGE_BASE_RULES.md`（知识库贯穿与增量更新规则）
+4. `$FRAMEWORK/docs/DEVPILOT_CLAUDE_CODE_GUIDE.md`（Claude Code 委派协议）
+5. `$FRAMEWORK/README.md`（按需查阅关键章节）
 
 ### 第 2 步：输出操作菜单
 
@@ -32,19 +34,23 @@ description: 在任何目录下激活 Autopilot 智能开发流水线。加载�
 
 | 输入方式 | 说明 |
 |---------|------|
-| `生成知识库，目标项目：<路径>` | 扫描项目代码，生成结构化知识文档 |
-| `查看状态，目标项目：<路径>` | 查看各需求进度和文档完整性 |
-| `需求分析：<功能描述>，目标项目：<路径>` | 分析需求，评估 S/M/L 级别（通过 /van → Agent 执行） |
-| `生成PRD` | 生成产品需求文档（通过 /van → Agent 执行） |
-| `软件设计` / `变更策略` | 软件架构设计或变更策略（通过 /van → Agent 执行） |
-| `代码实现` / `开始编码` | TDD 代码实现（通过 /van → Agent 执行） |
-| `测试用例` / `回归验证` | 测试用例或回归验证清单（通过 /van → Agent 执行） |
-| `测试报告` / `运行测试` | 执行测试，生成报告（通过 /van → Agent 执行） |
-| `需求变更：<需求标识> <变更描述>` | 分析变更影响，增量重做（通过 /van → Agent 执行） |
-| `/jit-env-auto-setup` | 检测 Node/Python/git 环境，检测完即可用读取或生产文件 |
+| `生成知识库，目标项目：<路径>` | 任务2：扫描项目，生成知识库 |
+| `查看状态，目标项目：<路径>` | 查看需求进度和文档完整性 |
+| `需求分析：<功能描述>，目标项目：<路径>` | 任务3：需求分析 + S/M/L 分级（requirements-analysis-agent） |
+| `生成PRD` | 任务4：产品需求文档 |
+| `确认PRD，生成接口契约` | 任务4.5：接口契约先行（高风险 / L 级推荐） |
+| `软件设计` / `变更策略` | 任务5：软件设计 |
+| `代码实现` / `开始编码` | 任务6：TDD 代码实现 |
+| `测试用例` / `回归验证` | 任务7：测试用例文档 |
+| `测试报告` / `运行测试` | 任务8：测试报告 |
+| `知识库更新` / `更新知识库` | 任务8.5：/jit-project-knowledge-base-update |
+| `需求变更：<需求标识> <变更描述>` | 任务9：变更影响分析 |
+| `/jit-env-auto-setup` | 检测 Node/Python/git 环境 |
+| `/jit-project-knowledge-base-update` | 知识库增量更新 |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计引擎 |
+| `/jit-nowTimeAndModel` | 查看日期时间与模型信息 |
 
-禁止扫描 docs 目录、禁止调用 project-autopilot-status。
+**目标项目目录**：Agent 在 `$FRAMEWORK/.claude/agents/`，通过读取 agent md + Task 委派，见 DEVPILOT_CLAUDE_CODE_GUIDE.md。
 
 ---
 
@@ -118,3 +124,16 @@ AI: [创建 docs/mgmt-ap-real-mac-id/00-原始需求.md 和 CHANGELOG.md]
 如果用户意图模糊（如"检查下"、"看看"、"完善工具"等），**先确认意图再行动**：
 - 判断是否涉及需求/变更 → 是则走门控，否则按常规处理
 - 不确定时 → **向用户确认**："这个改动是作为新需求走 Autopilot 流程，还是直接修改？"
+
+#### 3.6 Superpowers 阶段内增强协议
+
+Superpowers 不作为 DevPilot 主入口，只能在阶段内部增强执行质量。每次使用必须记录：
+
+| 字段 | 说明 |
+|------|------|
+| 触发阶段 | 任务3 / 任务4.5 / 任务5 / 任务6 / 任务8前等 |
+| 使用 skill | brainstorming、test-driven-development、systematic-debugging 等 |
+| 输入材料 | 当前阶段允许读取的文档、代码或测试结果 |
+| 输出证据 | 问题清单、方案取舍、RED/GREEN/REFACTOR、review 处理、verification 结果 |
+
+门禁未通过时必须停留当前阶段，不得进入下一阶段。

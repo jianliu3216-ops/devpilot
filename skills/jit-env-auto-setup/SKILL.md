@@ -21,17 +21,28 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
 
 **自动执行以下检测：**
 
-1. **检测 Node.js 版本**
+1. **检测 Node.js 版本**（使用 `node -p process.versions.node`，避免 Windows CRLF 解析问题）
    ```bash
-   node -v
+   node -p "process.versions.node"
    ```
 
-2. **检测预安装的 node_modules 路径**
+2. **检测 CodeGraph**（知识库/变更影响分析加速）
+   ```bash
+   source "$FRAMEWORK/scripts/node-detect.sh"
+   node_detect_init
+   codegraph_installed          # 只表示 CLI --version 可用
+   codegraph_build_works "<目标项目路径>"  # 真正确认 build 可用
+   ```
+   - `codegraph_build_works` 通过 → 输出 `✅ CodeGraph: build 可用`，知识库/变更任务应优先读取 `.codegraph/`
+   - 仅 `codegraph --version` 可用但 `build` 失败 → 输出 `⚠️ CodeGraph: CLI 可用但 build 失败`，按大项目降级策略执行
+   - `npm ls -g @optave/codegraph` 有记录但 CLI 失败 → 提示残留安装，需 `npm uninstall -g @optave/codegraph` 后重装（需 Node >= 22.12.0，Windows 见 docs/CodeGraph 安装指南.md）
+
+3. **检测预安装的 node_modules 路径**
    - 检查路径：`$HOME/.claude/tools/node-libs/node_modules`
    - 确认 docx、mammoth、xlsx、pdf-parse、officeparser 等常用库是否已安装
    - 如果路径不存在，提示用户运行 `bash install.sh --tools` 安装基础工具包
 
-3. **设置 NODE_PATH 环境变量**
+4. **设置 NODE_PATH 环境变量**
    ```bash
    export NODE_PATH="$HOME/.claude/tools/node-libs/node_modules"
    ```
@@ -53,6 +64,7 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
 ```
 ✅ 环境检测完成：
 - Node.js: v20.20.0
+- CodeGraph: build 可用 / CLI 可用但 build 失败 / 未安装
 - NODE_PATH: $HOME/.claude/tools/node-libs/node_modules
 - 可用库: docx, mammoth, xlsx, officeparser 等
 - 可直接运行 Node.js 脚本，无需重复安装依赖

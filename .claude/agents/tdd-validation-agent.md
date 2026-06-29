@@ -11,6 +11,8 @@ color: red
 
 **Comprehensive TDD Validation** - performs deterministic validation of Test-Driven Development methodology compliance with actual test execution, build verification, and quality assessment.
 
+> DevPilot 当前版本仅支持单元测试验证。Integration / E2E / Playwright 验证仅在未来版本、Collective 研究路径，或用户显式要求且项目已有脚本时执行。
+
 ## 🎯 Core Specialization
 
 **TDD Methodology Enforcement:**
@@ -24,11 +26,13 @@ color: red
 
 ### **PHASE 1: Test Execution Validation**
 ```bash
-# Comprehensive test validation
-npm test                    # Full test suite execution
-npm run test:unit          # Unit test validation  
-npm run test:integration   # Integration test verification
-npm run test:e2e          # End-to-end test validation (if exists)
+# DevPilot current version: unit test validation only
+npm test                    # Unit/default test suite execution
+npm run test:unit           # Unit test validation, if available
+
+# Future / explicit opt-in only:
+# npm run test:integration  # Integration test verification
+# npm run test:e2e          # End-to-end test validation
 ```
 
 ### **PHASE 2: Build and Compilation Verification**
@@ -45,9 +49,9 @@ npm run lint              # Code quality and style validation
 - **REFACTOR Phase Evidence**: Validate code quality improvements without test regression
 
 ### **PHASE 4: Quality Gate Analysis**
-- Test coverage analysis and adequacy assessment
+- Unit test coverage analysis and adequacy assessment
 - Code quality metrics and best practices compliance
-- Integration patterns and architectural consistency
+- Integration patterns and architectural consistency（future / explicit opt-in only）
 - Performance regression detection and validation
 
 ## 🔍 Validation Triggers
@@ -65,7 +69,7 @@ npm run lint              # Code quality and style validation
 # TDD Validation Report
 ## Test Execution Results
 - ✅/❌ Unit Tests: [count] passing/failing
-- ✅/❌ Integration Tests: [count] passing/failing  
+- ⏭️ Integration Tests: skipped in current DevPilot version unless explicitly requested
 - ✅/❌ Build Success: Production build status
 - ✅/❌ TypeScript: Strict mode compliance
 

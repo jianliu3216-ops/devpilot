@@ -29,19 +29,31 @@ Request → 🧠 Quick Analysis → 🎯 Agent Selection → ⚡ Task Delegation
 
 ## 🧠 IMMEDIATE AGENT ROUTING
 
-**Bypass analysis for obvious requests:**
+> **DevPilot 流水线（推荐）**：在目标项目目录使用 `/jit-devpilot-init` + 自然语言或 `/jit-*` Skill。
+> **不依赖本表**。详见 `$FRAMEWORK/docs/DEVPILOT_CLAUDE_CODE_GUIDE.md`。
+> 下列 DevPilot 关键字由**主会话**按 README 执行，或委派 `$FRAMEWORK/.claude/agents/*.md`：
+
+| User Says (DevPilot) | Agent / Skill | Notes |
+|---------------------|---------------|-------|
+| **需求分析 / 分析需求** | **requirements-analysis-agent** | 任务 3 |
+| **生成PRD / PRD** | **prd-generation-agent** | 任务 4 |
+| **软件设计 / 变更策略** | **software-design-agent** | 任务 5 |
+| **代码实现 / 开始编码** | **code-implementation-agent** | 任务 6 |
+| **测试用例** | 主会话 + Agent 委派 | 任务 7 |
+| **测试报告** | 主会话 + Agent 委派 | 任务 8 |
+| **知识库更新** | **/jit-project-knowledge-base-update** | 任务 8.5 |
+| **需求变更** | **change-request-agent** | 任务 9 |
+
+**Collective 实现路由（仅框架目录 /van 会话）**：
 
 | User Says | Instant Agent | Why Skip Analysis |
 |-----------|---------------|-------------------|
-| **"build/create/implement X"** | **@component-implementation-agent** OR **@feature-implementation-agent** | Direct implementation needed |
-| **"build app from PRD"** | **@prd-parser-agent** | Parse PRD → research → generate tasks |
-| **"create app from PRD"** | **@prd-parser-agent** | Parse PRD → research → generate tasks |
-| **"create application using PRD"** | **@prd-parser-agent** | Parse PRD → research → generate tasks |
-| **"implement from PRD"** | **@prd-parser-agent** | Parse PRD → research → generate tasks |
-| **"execute tasks"** | **@task-orchestrator** | Coordinate existing TaskMaster tasks |
-| **"fix/debug/resolve X"** | **@feature-implementation-agent** | Direct problem-solving |
-| **"test/validate X"** | **@testing-implementation-agent** | Direct testing workflow |
-| **"optimize/polish X"** | **@polish-implementation-agent** | Direct improvement |
+| **"build/create/implement X"** | **@component-implementation-agent** OR **@feature-implementation-agent** | Direct implementation |
+| **"build app from PRD"** | **@prd-research-agent** | PRD research (Collective, not DevPilot task 4) |
+| **"execute tasks"** | **@task-orchestrator** | TaskMaster coordination |
+| **"fix/debug/resolve X"** | **@feature-implementation-agent** | Problem-solving |
+| **"test/validate X"** (English, Collective) | **@testing-implementation-agent** | Smoke tests only |
+| **"optimize/polish X"** | **@polish-implementation-agent** | Improvement |
 | **"research/analyze/compare X"** | **@research-agent** | Direct research needed |
 | **"setup/configure build"** | **@infrastructure-implementation-agent** | Direct infrastructure work |
 | **"review/check quality"** | **@quality-agent** | Direct quality validation |
@@ -54,9 +66,9 @@ Request → 🧠 Quick Analysis → 🎯 Agent Selection → ⚡ Task Delegation
 **When routing isn't obvious:**
 
 | Request Category | Analysis Approach | Agent Selection Strategy |
-|------------------|-------------------|--------------------------| 
+|------------------|-------------------|--------------------------|
 | **🔧 Implementation & Features** | Assess UI vs logic complexity | UI-focused → `@component-implementation-agent`, Logic-focused → `@feature-implementation-agent`, Full-stack → both |
-| **🧪 Testing & Quality** | Scope and current state | New tests → `@testing-implementation-agent`, Quality check → `@quality-agent`, Performance → `@polish-implementation-agent` |
+| **Testing Focus?** | Scope and current state | 冒烟/TDD → `@testing-implementation-agent`；Quality check → `@quality-agent` |
 | **🏗️ Infrastructure & Build** | Setup vs maintenance | New project → `@infrastructure-implementation-agent`, Deployment → `@devops-agent` |
 | **📚 Research & Analysis** | Information vs implementation | Pure research → `@research-agent`, Research + implementation → `@prd-research-agent` |
 | **🌟 Multi-Domain/Epic** | Decomposition and coordination needs | Always → `@task-orchestrator` with TaskMaster integration |
@@ -65,10 +77,13 @@ Request → 🧠 Quick Analysis → 🎯 Agent Selection → ⚡ Task Delegation
 
 ```
 Request Analysis
-├── PRD Document? → @prd-parser-agent → @research-agent → @task-generator-agent → @task-orchestrator
+├── DevPilot 关键字? → 见 DEVPILOT_CLAUDE_CODE_GUIDE.md（主会话 / jit Skill，不经 Collective）
 ├── UI/Component Focus? → @component-implementation-agent
-├── Business Logic Focus? → @feature-implementation-agent  
-├── Testing Focus? → @testing-implementation-agent
+├── Business Logic Focus? → @feature-implementation-agent
+├── Testing Focus?
+│   ├── DevPilot 测试用例? → 主会话 + Agent 委派
+│   └── Collective 冒烟? → @testing-implementation-agent
+├── PRD Document (Collective)? → @prd-research-agent → @research-agent → @task-orchestrator
 ├── Infrastructure Focus? → @infrastructure-implementation-agent
 ├── Quality Focus? → @quality-agent OR @polish-implementation-agent
 ├── Research Focus? → @research-agent
