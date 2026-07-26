@@ -173,22 +173,23 @@ DevPilot 负责项目级流水线：入口触发、需求标识确认、阶段�
   ```
 - **工具**：直接调用您自定义的 Skill → `/jit-project-knowledge-base`
 - **实际调用示例（框架自动执行，你不需要输入）**：
-  
+
   ```
   /jit-project-knowledge-base --target "D:\projects\my-existing-project" --output "D:\projects\my-existing-project\docs\knowledge-base\PROJECT_KNOWLEDGE_BASE.md"
   ```
 - **输出**：`[目标项目]/docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`
-  
+
   - 👉 **输出到目标项目目录，不是输出到框架目录**
   - 如果项目相对复杂进行深度分析 输出`[目标项目]/docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`
   - 内容：项目架构概览、模块字典说明、可复用工具/组件索引、重构建议
 - **你的工作**：只需要告诉我目标项目路径
 - **我的工作**：
-  
+
   - 自动在目标项目创建 `docs/knowledge-base/` 目录（如果不存在）
-  - 如果项目较大，优先检测并运行 `codegraph build`，成功后用 `.codegraph/` 作为模块依赖分析输入；失败时降级为“索引优先 + 分模块深扫”
+  - **第一步**：运行 `preflight-kb.sh` / `preflight-kb.ps1` 做轻量自检，展示源码文件数、项目体积、是否大项目、CodeGraph 状态和建议动作
+  - 若检测为大项目，必须先询问你是否使用 CodeGraph；你确认后才执行 `codegraph build`，成功后用 `.codegraph/` 作为模块依赖分析输入；未安装、失败或你选择不用时，提示耗时风险并降级为“索引优先 + 分模块深扫”
   - 自动调用 skill 生成文档
-  - 生成完成后运行 `node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目路径>"` 校验 BASE/DETAIL、需求索引、更新记录和 CodeGraph 状态
+  - 生成完成后运行 `node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目路径>" [--strict]` 校验 BASE/DETAIL、需求索引、更新记录和 CodeGraph 状态
   - 记住这个文件路径，**所有后续阶段委派 Agent 时，都会在命令中拼上这个文件的完整绝对路径，并且明确告诉 Agent：请参考这个知识库理解项目，不需要读取整个项目代码**
   - 生成完成后**明确告诉你**：生成了哪个文件，完整路径是什么
 - **完成条件**：知识库生成 → **您确认** → 进入下一任务（阶段 3：需求分析）
@@ -370,8 +371,7 @@ DevPilot 负责项目级流水线：入口触发、需求标识确认、阶段�
   | 旧 key | 新 key | 说明 |
   |--------|--------|------|
 
-  ## 知识库锚点
-  [锚点信息]
+  > 知识库锚点统一在 `CHANGELOG.md` 的 `## 知识库锚点` section 维护，本设计文档不再单独列章节。
 
   ## 变更记录
   | 版本 | 日期 | 变更范围 | 说明 |
@@ -817,7 +817,7 @@ AI 收到 `级别：L` 后直接走 L 级流程（设计 + 策略 + 测试 + 回
 
 > **推荐**：在**目标项目目录**（或任意目录）启动 Claude Code，首条消息执行 `/jit-devpilot-init` 激活流水线。
 >
-> Skills 通过 `install.sh` 安装到 `~/.claude/skills/` 后**全局可用**；完整行为规则由 init Skill 从 `~/.claude/devpilot-framework-path` 加载框架 `CLAUDE.md`。  
+> Skills 通过 `install.sh` 安装到 `~/.claude/skills/` 后**全局可用**；完整行为规则由 init Skill 从 `~/.claude/devpilot-framework-path` 加载框架 `CLAUDE.md`。
 > **框架升级后若缺少新 Skill**，在框架目录执行：`bash update-skills.sh`
 >
 > ```bash
@@ -936,7 +936,7 @@ title {流程图标题}
 
 - **必须做**：读取 BASE.md 整体架构 + 技术栈约束，确保需求不超出已有技术能力
 - **必须做**：参考同领域已有 PUML 流程图，复用已验证的实现模式
-- **必须做**：在 PRD 中增加「知识库锚点」章节，标明：
+- **必须做**：在 `CHANGELOG.md` 中增加 `## 知识库锚点` section（**唯一写入位置**，不在 01/02/03 等开发文档内重复），标明：
   ```markdown
   ## 知识库锚点
   - 关联知识库版本：PROJECT_KNOWLEDGE_BASE.md @ v2.1
@@ -950,18 +950,18 @@ title {流程图标题}
 
 ### 规则 4：软件设计阶段强制引用 PUML 流程图（必须校验）
 
-✅ **必须引用已有 PUML 流程图作为基准**，不能脱离已实现的代码架构  
-✅ 修改流程的，必须在设计文档中标注「此设计修改了 `{文件名}.puml` 中第 X 节点」  
-✅ 新增流程的，设计评审通过后必须生成新的 `*.puml` 文件并入知识库  
+✅ **必须引用已有 PUML 流程图作为基准**，不能脱离已实现的代码架构
+✅ 修改流程的，必须在设计文档中标注「此设计修改了 `{文件名}.puml` 中第 X 节点」
+✅ 新增流程的，设计评审通过后必须生成新的 `*.puml` 文件并入知识库
 
-❌ **禁止**：设计和已实现代码完全脱节，出现「设计一套、实现另一套」  
-❌ **禁止**：只写设计文档不更新知识库，导致设计和实现两张皮  
+❌ **禁止**：设计和已实现代码完全脱节，出现「设计一套、实现另一套」
+❌ **禁止**：只写设计文档不更新知识库，导致设计和实现两张皮
 
 ---
 
-### 规则 5：所有开发文档必须包含「知识库锚点」
+### 规则 5：CHANGELOG.md 必须包含「知识库锚点」
 
-需求分析文档、PRD、设计文档、测试报告，**每个文档顶部必须包含知识库锚点**，格式见规则 3。
+每个需求目录的 `CHANGELOG.md` 必须包含 `## 知识库锚点` section（格式见规则 3）。这是知识库锚点的唯一写入位置，01/02/03/05 等开发文档不再各自重复写锚点。
 
 ---
 
@@ -1124,11 +1124,11 @@ git revert <commit-id>    # 生成一个反向提交，保留历史
 
 ---
 
-### Q9: 如果我忘了用 `/jit-project-autopilot-status`，是否每次都需要带目录？
+### Q9: 如果我忘了用 `/jit-project-devpilot-status`，是否每次都需要带目录？
 
 **A:**
 - ✅ **只要你第一次提供目标项目路径**，我就会记住，后续阶段**不需要**每次都带
-- ✅ `/jit-project-autopilot-status` 主要用于：
+- ✅ `/jit-project-devpilot-status` 主要用于：
   1. 新开 Claude 会话后，恢复记忆告诉你当前在哪个项目
   2. 切换到另一个项目开发
   3. 忘记当前项目路径时，查看状态

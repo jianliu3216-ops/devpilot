@@ -1,6 +1,6 @@
 ---
 name: jit-project-knowledge-base
-description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包含架构概览、模块字典、工具函数索引、可复用资产和重构建议。用于历史项目接入或构建项目私域知识库。
+description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md。生成前先轻量自检文件数/项目大小/CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才 build，不可用或拒绝时提示耗时风险并降级扫描。
 ---
 
 # 项目知识库构建（Project Knowledge Base Builder）
@@ -11,10 +11,17 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 
 ## 前期准备
 
-执行本 Skill 前：
-1. 读取同级目录 `reference.md` → 了解各表格的字段标准
-2. 读取同级目录 `examples.md` → 了解最终输出的结构示例
-3. **CodeGraph（若已安装则 MUST 执行）**：检测 `codegraph --version`；可用时在目标项目根目录执行 `codegraph build`，将 `.codegraph/` 产出作为 Phase 1–2 模块依赖分析的优先输入（见下方 Phase 0.2）
+执行本 Skill 前，AI MUST 主动读取以下同级文件（由 AI 使用读取工具完成，不要求用户手动打开）：
+
+1. `reference.md` → 字段标准，决定模块字典、工具索引、技术栈、图资产等表格字段
+2. `examples.md` → 输出结构示例，决定 BASE / DETAIL 的呈现形态
+3. `HISTORY_PROJECT_ANALYSIS_GUIDE.md` → 历史项目分析方法，补充宏观认知、模块梳理、资产提取、质量关键点
+
+辅助文件优先级：
+- `SKILL.md` 是唯一运行时主流程；若与辅助文件冲突，以 `SKILL.md` 为准
+- `reference.md` 的字段定义优先级高于示例文本
+- `HISTORY_PROJECT_ANALYSIS_GUIDE.md` 只提供分析方法与质量检查，不得覆盖 Phase 0.0–0.2 的 preflight / 用户确认 / CodeGraph 规则
+- `USAGE.md` 是给用户和团队看的使用说明，不是运行时必读文件；只有当用户询问“如何使用/如何触发/安装位置/对话模板”时才需要读取
 
 严格遵循 `reference.md` 的字段定义输出。
 
@@ -24,7 +31,7 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 
 开始前请先向用户确认/获取：
 
-1. 项目根目录绝对路径
+1. 项目根目录绝对路径（**拿到路径后 MUST 立即执行 Phase 0.0 轻量自检，再读源码内容**）
 2. 允许读取的范围/是否可全量检索
 3. 输出语言（默认中文）
 4. 输出文件路径（默认：项目根目录 `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md` + `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`，允许用户指定其他 `docs/knowledge-base/` 下路径）
@@ -43,11 +50,114 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 
 ## 标准流程（固定顺序，Mandatory Order）
 
-### Phase 0 - 范围与边界
+### Phase 0.0 - 生成前轻量自检（MUST，第一步）
 
-- 评估项目规模与预期深度
+**在读取任何源码内容、执行大范围 grep、或全量分析之前**，AI 必须通过工具自动运行 preflight，并向用户展示结果。Phase 0.0 只允许做轻量元数据扫描：统计文件数、项目体积、构建文件数量、`.codegraph/` 是否存在、CodeGraph CLI 状态；不得读取源码正文。
+
+执行要求：
+- 这是 AI 的内部工具步骤，不是让用户手动复制命令执行
+- 在 Cursor/Claude Code 中，AI MUST 使用 Shell/PowerShell 工具执行下列命令
+- 若命令失败，AI MUST 把失败原因展示给用户，并按 Phase 0.1 的降级/修复分支处理
+
+```bash
+# Git Bash / macOS / Linux
+bash "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/preflight-kb.sh" "<目标项目绝对路径>"
+
+# Windows PowerShell
+powershell -ExecutionPolicy Bypass -File "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/preflight-kb.ps1" "<目标项目绝对路径>"
+```
+
+`$FRAMEWORK` 来自 `~/.claude/devpilot-framework-path`。
+
+**默认 preflight 只检测，不执行 `codegraph build`。**
+
+**preflight 输出字段（MUST 向用户说明）**：
+
+| 字段 | 含义 |
+|------|------|
+| `SOURCE_FILE_COUNT` | 轻量统计的源码文件数量 |
+| `PROJECT_SIZE_MB` | 轻量统计的项目体积 |
+| `IS_LARGE_PROJECT` | 是否命中大项目判定 |
+| `LARGE_PROJECT_REASON` | 大项目原因：文件数/体积/多构建文件 |
+| `CODEGRAPH_STATUS` | `CLI_READY` / `NOT_INSTALLED` / `BROKEN_INSTALL` |
+| `CODEGRAPH_CACHE_STATUS` | `.codegraph/` 缓存状态：`CACHED_OK` / `MISSING` / `STALE` / `UNKNOWN_STALE` |
+| `RECOMMENDED_ACTION` | 下一步建议：是否询问使用 CodeGraph、直接扫描、安装或修复 |
+| `MESSAGE` | 面向用户的提示语 |
+
+---
+
+### Phase 0.1 - 大项目判定与用户确认（MUST）
+
+根据 Phase 0.0 输出决定后续路径：
+
+| 条件 | 必须提示 | 后续动作 |
+|------|----------|----------|
+| `IS_LARGE_PROJECT=false` | “检测到 N 个源码文件，项目规模不大，可直接生成知识库。” | 可继续 Phase 0.3 / Phase 1 |
+| `IS_LARGE_PROJECT=true` 且 `CODEGRAPH_STATUS=CLI_READY` | “检测到 N 个源码文件，属于大项目。建议使用 CodeGraph，否则耗时较长且可能受上下文限制。” | **必须询问用户是否使用 CodeGraph** |
+| `IS_LARGE_PROJECT=true` 且 `CODEGRAPH_STATUS=NOT_INSTALLED` | “项目较大，未安装 CodeGraph。直接扫描会较慢且可能不完整。” | 询问：安装后重试 / 直接降级扫描 / 先生成快速骨架 |
+| `IS_LARGE_PROJECT=true` 且 `CODEGRAPH_STATUS=BROKEN_INSTALL` | “CodeGraph 安装异常，大项目直接扫描风险较高。” | 询问：修复后重试 / 直接降级扫描 / 快速骨架 |
+
+大项目询问格式：
+
+```markdown
+检测到项目较大：
+- 源码文件数：{SOURCE_FILE_COUNT}
+- 项目体积：{PROJECT_SIZE_MB} MB
+- CodeGraph 状态：{CODEGRAPH_STATUS}
+- 缓存状态：{CODEGRAPH_CACHE_STATUS}
+
+建议使用 CodeGraph 生成依赖图后再构建知识库，可降低上下文压力和漏扫风险。
+请选择：
+1. 使用 CodeGraph（推荐，确认后执行 preflight-kb --build）
+2. 不使用，直接降级扫描（耗时较长，可能不完整）
+3. 暂停，先安装/修复 CodeGraph
+```
+
+**硬规则**：
+- 大项目在用户确认前，禁止执行 `codegraph build`
+- 大项目在用户确认前，禁止全量读取源码或大范围 grep
+- 小项目也必须展示文件数量和 CodeGraph 状态，但不需要强制询问
+- 用户选择直接扫描时，必须在知识库 BASE 的「CodeGraph 状态」小节记录降级原因
+
+---
+
+### Phase 0.2 - CodeGraph build 或降级策略（按用户确认执行）
+
+用户确认使用 CodeGraph 后执行：
+
+```bash
+bash "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/preflight-kb.sh" "<目标项目绝对路径>" --build
+# 或 Windows PowerShell
+powershell -ExecutionPolicy Bypass -File "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/preflight-kb.ps1" "<目标项目绝对路径>" -Build
+```
+
+**`--build` vs `--rebuild` 区别**：
+
+| 参数 | 行为 | 适用场景 |
+|------|------|---------|
+| `--build` | 缓存有效（CACHED_OK）时复用，不重 build；缓存缺失或过期才 build | 默认推荐，避免不必要重建 |
+| `--rebuild` | 忽略现有缓存，强制重新 build | 源码大改动后、CodeGraph 升级后、怀疑缓存损坏时 |
+
+| PREFLIGHT_STATUS | 含义 | 后续动作 |
+|------------------|------|----------|
+| `BUILD_OK` | build 刚成功 | Phase 1–2 **必须**优先读 `.codegraph/` |
+| `CACHED_OK` | `.codegraph/` 已存在且未过期 | 同上 |
+| `NOT_INSTALLED` | 未装 CodeGraph | 按用户选择安装后重试或降级扫描 |
+| `BUILD_FAILED` | CLI 可用但 build 失败 | 输出失败说明，询问修复后重试或降级扫描 |
+| `BROKEN_INSTALL` | 残留损坏安装 | 提示 `docs/CodeGraph 安装指南.md`，询问修复后重试或降级扫描 |
+
+**硬规则**：
+- 检测标准以 **`codegraph build` 成功** 为准（不是仅 `codegraph --version`）
+- `BUILD_FAILED` 必须按 build 失败处理，不能误写成 `CLI_ONLY`
+- 知识库 BASE 文档 MUST 包含「CodeGraph 状态」小节（状态 + 用户选择 + 降级原因，若有）
+
+---
+
+### Phase 0.3 - 范围、边界与项目特征标签
+
+- 评估项目规模与预期深度（基于 Phase 0.0 输出，不再重复全量扫描）
 - **大项目判定（MUST）**：若满足任一条件，默认进入“大项目模式”：自有源码文件数 > 500、仓库体积 > 100MB、多模块/monorepo、或用户选择“标准完整/尽量详尽”
-- **大项目模式下 CodeGraph 优先**：必须先尝试 CodeGraph 预扫描；成功后以 `.codegraph/` 作为 Phase 1–2 的优先输入，禁止直接进入无范围全量源码读取
+- **大项目模式下 CodeGraph 优先**：用户选择使用 CodeGraph 且 preflight 为 `BUILD_OK`/`CACHED_OK` 时，Phase 1–2 **必须**以 `.codegraph/` 为优先输入；否则必须记录降级策略
 - **自动检测构建系统**：
   - 找到 `pom.xml` → Maven 项目 (Java/Kotlin)
   - 找到 `build.gradle` / `build.gradle.kts` → Gradle 项目 (Java/Kotlin)
@@ -60,36 +170,10 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md，包�
 - 判断架构风格（单体 / 多模块 /  monorepo / 微服务聚合）
 - 记录假设与限制（未能构建、证据缺失、权限不足、部分目录无法扫描等）
 
-#### Phase 0.2 - CodeGraph 预扫描（CLI 可用时 MUST）
-
-```bash
-# 在目标项目根目录执行
-codegraph --version          # 不可用则跳过本阶段
-codegraph build              # 生成 .codegraph/ 依赖图谱
-```
-
-**使用规则**：
-- `codegraph build` 成功 → Phase 1–2 **优先**读取 `.codegraph/` 中的模块/依赖/调用关系，减少全量 grep
-- 大项目中 `codegraph` 不可用 / build 失败 → 必须输出降级说明，并改为“索引优先 + 分模块深扫”：先目录/构建/入口/依赖索引，再按用户确认的模块域逐步读取源码
-- 小项目中 `codegraph` 不可用 → 可回退手动扫描，在文档中注明「未使用 CodeGraph」
-- 可选深化：`codegraph fn-impact <函数>`（变更场景）、`codegraph dead-code`（重构建议）
-- Windows 安装失败：见 `docs/CodeGraph 安装指南.md`（需 Node >= 22.12.0）
-
-#### Phase 0.3 - 知识库结构校验（生成后 MUST）
-
-知识库生成完成后执行：
-
-```bash
-node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>"
-```
-
-校验结果必须写入交付说明。若存在 Error，知识库不算完成；若大项目缺少 `.codegraph/`，必须解释原因并记录降级策略。
-
----
-
-#### Phase 0.1 - 项目特征标签（自动检测 + 用户多选组合）
+#### 项目特征标签（轻量检测 + 用户多选组合）
 
 > **核心思路**：不把项目硬塞进一个类别，而是用**多维度标签组合**描述项目特征，不同标签组合决定后续分析侧重。
+> 本阶段允许轻量扫描文件名、目录名、构建文件和少量入口文件关键字；仍禁止全量读取所有源码。全量源码读取只允许在 Phase 1.1 发生。
 
 **Step 1 — 自动检测，生成推荐标签**
 
@@ -608,6 +692,20 @@ docs/knowledge-base/
 - 整理模型结构、超参数配置与训练方式
 - 标注推理接口输入输出格式
 - 说明模型评估指标与性能结果
+
+---
+
+### Phase 8 - 知识库结构校验（生成后 MUST）
+
+知识库文档写入完成后执行：
+
+```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>"
+# 大项目且用户选择 CodeGraph 或 preflight 曾为 BUILD_OK/CACHED_OK 时，建议加 --strict
+node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>" --strict
+```
+
+校验结果必须写入交付说明。若存在 Error，知识库不算完成；`--strict` 下大项目缺少 `.codegraph/` 视为 Error（除非用户明确选择降级扫描，且 BASE 中已记录降级原因）。
 
 ---
 

@@ -1,6 +1,8 @@
 # 历史项目分析方法 & 提示词模板
 
 > 用于新接收历史项目时，快速建立项目知识库，提取可复用资产
+> 
+> **运行时说明**：本文件是方法论参考，不是主流程。执行 `jit-project-knowledge-base` 时必须以 `SKILL.md` 为准；本文件不得覆盖 `SKILL.md` 中的 preflight、CodeGraph 用户确认、输出路径、BASE/DETAIL 分层和校验规则。
 
 ---
 

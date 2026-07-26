@@ -1,5 +1,5 @@
 #!/bin/bash
-# Autopilot 智能流水线 - 卸载脚本
+# DevPilot 智能流水线 - 卸载脚本
 # 移除本流水线安装的 Skills 和 Node.js 工具包
 #
 # 用法：
@@ -18,13 +18,13 @@ pause_exit() {
 }
 
 echo "========================================="
-echo "  Autopilot 智能流水线 - 卸载"
+echo "  DevPilot 智能流水线 - 卸载"
 echo "========================================="
 echo ""
 
 # --- 卸载 Skills（删除本项目安装的全部 Skills） ---
 echo "将删除以下内容："
-echo "  - ~/.claude/skills/ 下的 Autopilot Skills"
+echo "  - ~/.claude/skills/ 下的 DevPilot Skills"
 echo "  - ~/.claude/tools/node-libs/ 工具包"
 echo ""
 echo "是否确认卸载？(y/n)"
@@ -45,7 +45,7 @@ for skill_dir in "$SCRIPT_DIR"/skills/*/; do
 done
 
 if [ "$REMOVED" -eq 0 ]; then
-    echo "未找到已安装的 Autopilot Skills"
+    echo "未找到已安装的 DevPilot Skills"
 else
     echo "✅ 已卸载 $REMOVED 个 Skills"
 fi

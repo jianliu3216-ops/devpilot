@@ -3,21 +3,26 @@
  * DevPilot knowledge-base validator.
  *
  * Usage:
- *   node validate-kb.js <project-root>
+ *   node validate-kb.js <project-root> [--strict]
+ *
+ * --strict  Large projects (>500 source files) without .codegraph/ become errors
+ *           (use when preflight reported BUILD_OK/CACHED_OK).
  *
  * Checks the minimum structure required by DevPilot:
  * - docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md
  * - docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md
  * - DETAIL sections for requirement index, function/API change index, update records
- * - requirement docs with 00 files containing a knowledge-base anchor
+ * - requirement docs with CHANGELOG.md containing a 知识库锚点 section
  * - large projects should have a .codegraph directory
  */
 const fs = require("fs");
 const path = require("path");
 
-const projectRoot = process.argv[2];
+const args = process.argv.slice(2);
+const strict = args.includes("--strict");
+const projectRoot = args.find((a) => !a.startsWith("-"));
 if (!projectRoot) {
-  console.error("Usage: node validate-kb.js <project-root>");
+  console.error("Usage: node validate-kb.js <project-root> [--strict]");
   process.exit(2);
 }
 
@@ -85,14 +90,14 @@ if (detail) {
 }
 
 for (const reqId of listRequirementDirs()) {
-  const originPath = path.join(docsDir, reqId, "00-原始需求.md");
-  if (!exists(originPath)) {
-    warnings.push(`Requirement ${reqId} missing 00-原始需求.md.`);
+  const changelogPath = path.join(docsDir, reqId, "CHANGELOG.md");
+  if (!exists(changelogPath)) {
+    warnings.push(`Requirement ${reqId} missing CHANGELOG.md.`);
     continue;
   }
-  const origin = readText(originPath);
-  if (!/##\s+知识库锚点/.test(origin)) {
-    warnings.push(`Requirement ${reqId} missing knowledge-base anchor in 00-原始需求.md.`);
+  const changelog = readText(changelogPath);
+  if (!/##\s+知识库锚点/.test(changelog)) {
+    warnings.push(`Requirement ${reqId} missing 知识库锚点 section in CHANGELOG.md.`);
   }
 }
 
@@ -101,13 +106,25 @@ const sourceExtensions = new Set([
   ".kt", ".lua", ".py", ".rs", ".sh", ".ts", ".tsx", ".vue",
 ]);
 const sourceFiles = walk(projectRoot, (filePath) => sourceExtensions.has(path.extname(filePath).toLowerCase()));
-if (sourceFiles.length > 500 && !exists(codegraphDir)) {
-  warnings.push(`Large project detected (${sourceFiles.length} source files) but .codegraph is missing. Run codegraph build before full KB generation.`);
+const largeProject = sourceFiles.length > 500;
+const codegraphMissingMsg = `Large project detected (${sourceFiles.length} source files) but .codegraph is missing. Run preflight-kb.sh and codegraph build before full KB generation.`;
+if (largeProject && !exists(codegraphDir)) {
+  if (strict) {
+    errors.push(codegraphMissingMsg);
+  } else {
+    warnings.push(codegraphMissingMsg);
+  }
+}
+
+const baseContent = readText(basePath);
+if (baseContent && !/##\s+CodeGraph\s+状态/.test(baseContent)) {
+  warnings.push("PROJECT_KNOWLEDGE_BASE.md missing section: ## CodeGraph 状态");
 }
 
 console.log("# DevPilot Knowledge Base Validation\n");
 console.log(`Project: ${projectRoot}`);
 console.log(`Source files counted: ${sourceFiles.length}`);
+console.log(`Strict mode: ${strict ? "on" : "off"}`);
 console.log(`CodeGraph: ${exists(codegraphDir) ? "present" : "missing"}\n`);
 
 if (errors.length) {

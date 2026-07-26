@@ -13,6 +13,7 @@
 | `SKILL.md` | 必须 | **执行流程主说明**：阶段划分、强约束、交付物结构、质量门槛 | 你要“跑流程”时看它；它决定助手怎么做事 |
 | `reference.md` | 推荐 | **字段标准**：模块字典/工具索引/技术栈/图资产/重构建议的字段定义 | 你想统一团队口径、避免文档字段飘忽时看它 |
 | `examples.md` | 推荐 | **通用结构示例**：展示 `PROJECT_KNOWLEDGE_BASE.md` 应该长什么样（不绑定业务） | 你想快速对齐输出长相、给新人示例时用它 |
+| `HISTORY_PROJECT_ANALYSIS_GUIDE.md` | 推荐 | **历史项目分析方法**：宏观认知、模块梳理、资产提取、质量关键点 | AI 执行 Skill 时会读取它作为方法补充，但以 `SKILL.md` 主流程为准 |
 | `USAGE.md` | 推荐 | **如何触发与如何对话**：配置位置、对话模板、常见缺失项 | 你想把 Skill 当“私域 SOP”教给团队时用它 |
 
 ---
@@ -57,7 +58,9 @@ Claude Code 没有内置 Skill 目录机制，有两种用法：
 
 推荐一句话直接给齐：
 
-> 请使用 `jit-project-knowledge-base` Skill。项目根目录：`E:/my-project`。输出中文。允许读取全仓。期望深度：尽量详尽。请在项目根目录生成 `PROJECT_KNOWLEDGE_BASE.md`。
+> 请使用 `jit-project-knowledge-base` Skill。项目根目录：`E:/my-project`。输出中文。允许读取全仓。期望深度：尽量详尽。输出到 `docs/knowledge-base/`。**请在流程内自动运行 preflight 做轻量自检，展示源码文件数、项目体积和 CodeGraph 状态；如果是大项目，请先问我是否使用 CodeGraph。**
+
+大项目或首次接入历史项目时，也可先执行 `/jit-env-auto-setup` 确认 CodeGraph build 是否可用。
 
 ---
 
@@ -93,6 +96,7 @@ Claude Code 没有内置 Skill 目录机制，有两种用法：
 
 按 `SKILL.md` 固定流程，助手会：
 
+- **自动运行 preflight 轻量自检**（由助手调用 `preflight-kb.sh` / `preflight-kb.ps1`，不需要用户手动执行），向用户展示源码文件数、项目体积、是否大项目和 CodeGraph 状态；大项目会先询问是否使用 CodeGraph，确认后才执行 `codegraph build`
 - 扫描目录与模块划分
 - 读取主构建文件提取技术栈与版本证据
 - 输出模块业务字典表

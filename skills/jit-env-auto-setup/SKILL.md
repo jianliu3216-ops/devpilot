@@ -33,7 +33,7 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
    codegraph_installed          # 只表示 CLI --version 可用
    codegraph_build_works "<目标项目路径>"  # 真正确认 build 可用
    ```
-   - `codegraph_build_works` 通过 → 输出 `✅ CodeGraph: build 可用`，知识库/变更任务应优先读取 `.codegraph/`
+   - `codegraph_build_works` 通过 → 输出 `✅ CodeGraph: build 可用`；知识库任务仍需先经 `preflight-kb.sh` 自检，大项目经用户确认后再 build 并优先读取 `.codegraph/`
    - 仅 `codegraph --version` 可用但 `build` 失败 → 输出 `⚠️ CodeGraph: CLI 可用但 build 失败`，按大项目降级策略执行
    - `npm ls -g @optave/codegraph` 有记录但 CLI 失败 → 提示残留安装，需 `npm uninstall -g @optave/codegraph` 后重装（需 Node >= 22.12.0，Windows 见 docs/CodeGraph 安装指南.md）
 

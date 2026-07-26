@@ -1,6 +1,6 @@
 # CodeGraph 安装指南
 
-> CodeGraph 是 Autopilot 的**可选**加速工具，未安装不影响流程（知识库 Skill 会自动回退为全量扫描）。
+> CodeGraph 是 DevPilot 的**可选**加速工具，未安装不影响流程（知识库 Skill 会自动回退为全量扫描）。
 > install.sh **不自动安装** CodeGraph，原因：Windows 上 `better-sqlite3` native 编译常失败，自动安装易留下损坏安装。
 
 ---
@@ -11,7 +11,7 @@
 - `codegraph fn-impact <函数>` — 精确计算变更影响半径（任务9 变更分析）
 - `codegraph dead-code` / `codegraph check` — 死代码检测 / CI 门禁
 
-知识库 Skill 在 Phase 0.2 检测 `codegraph --version`：可用则自动 `codegraph build`，否则跳过并在文档注明「未使用 CodeGraph」。
+知识库 Skill 在 Phase 0.0 通过 `preflight-kb.sh` 做轻量自检：先展示源码文件数、项目体积、是否大项目和 CodeGraph 状态。若项目较大，必须先询问用户是否使用 CodeGraph；用户确认后才执行 `codegraph build`（以 build 成功为准），成功后使用 `.codegraph/`，否则在文档注明降级原因。
 
 ---
 
@@ -120,7 +120,7 @@ rm -f "$(npm prefix -g)/codegraph" "$(npm prefix -g)/codegraph.cmd"
 rm -rf "$APPDATA/npm/node_modules/@optave/codegraph"
 ```
 
-卸载后 Autopilot 流程不受影响，知识库 Skill 自动回退全量扫描。
+卸载后 DevPilot 流程不受影响，知识库 Skill 自动回退全量扫描。
 
 ---
 

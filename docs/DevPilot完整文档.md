@@ -398,11 +398,11 @@ bash install.sh --tools
 | 测试报告 | `测试报告` |
 | 修改已有需求 | `需求变更：user-login 增加忘记密码` |
 | 同步知识库 | `知识库更新` |
-| 查看项目进度 | `/jit-project-autopilot-status` |
+| 查看项目进度 | `/jit-project-devpilot-status` |
 
 目标项目路径只需指定一次，后续自动继承。在项目目录下启动时自动识别。
 
-**可用 Skill 命令**：`/jit-devpilot-init` `/jit-project-knowledge-base` `/jit-project-autopilot-status` `/jit-env-auto-setup` `/jit-ui-ux-pro-max`
+**可用 Skill 命令**：`/jit-devpilot-init` `/jit-project-knowledge-base` `/jit-project-devpilot-status` `/jit-env-auto-setup` `/jit-ui-ux-pro-max`
 
 ---
 
@@ -530,7 +530,7 @@ DevPilot 不是"自定义了几个 Claude Code Skill"，而是一套完整的四
 |------|------|------|
 | jit-devpilot-init | `/jit-devpilot-init` | 激活流水线，自动识别目标项目 |
 | jit-project-knowledge-base | `/jit-project-knowledge-base` | 全量扫描生成项目知识库 |
-| jit-project-autopilot-status | `/jit-project-autopilot-status` | 查看项目各需求进度 |
+| jit-project-devpilot-status | `/jit-project-devpilot-status` | 查看项目各需求进度 |
 | jit-env-auto-setup | `/jit-env-auto-setup` | Node环境自动检测与配置使用 |
 | jit-ui-ux-pro-max | `/jit-ui-ux-pro-max` | UI/UX 智能设计引擎 |
 | jit-nowTimeAndModel | `/jit-nowTimeAndModel` | 时间模型工具 |
@@ -720,7 +720,7 @@ A: 不一定。可以说"跳过设计直接编码"。S 级自动跳过 PRD/设�
 A: 说"需求变更：xxx"，AI 自动分析影响范围，只重做受影响的部分。
 
 **Q: 新开会话怎么恢复？**
-A: "/jit-project-autopilot-status"，AI 自动扫描已有产出，告诉你进度和下一步。
+A: "/jit-project-devpilot-status"，AI 自动扫描已有产出，告诉你进度和下一步。
 
 **Q: DevPilot 和 Superpowers 冲突吗？**
 A: 不冲突。DevPilot 管流程（什么阶段做什么），Superpowers 管执行（具体怎么做）。阶段内部可调用。

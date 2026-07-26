@@ -1,6 +1,6 @@
 #!/bin/bash
 export TERM=ansi
-# Autopilot 智能流水线 - 一键安装脚本
+# DevPilot 智能流水线 - 一键安装脚本
 # 兼容：Windows Git Bash / macOS / Linux
 #
 # 前置要求：
@@ -49,7 +49,7 @@ for arg in "$@"; do
 done
 
 echo "========================================="
-echo "  Autopilot 智能流水线 - 安装向导"
+echo "  DevPilot 智能流水线 - 安装向导"
 echo "========================================="
 echo ""
 
@@ -272,12 +272,17 @@ if codegraph_installed; then
     CG_PREFIX=$(run_npm prefix -g 2>/dev/null | strip_crlf)
     CG_CLI="$CG_PREFIX/node_modules/@optave/codegraph/dist/cli.js"
     CG_VER=$(run_node "$CG_CLI" --version 2>/dev/null | strip_crlf)
-    echo "✅ CodeGraph 已就绪: ${CG_VER:-未知版本}"
-    echo "   知识库生成 / 变更分析时将自动调用 codegraph build"
+    echo "✅ CodeGraph CLI 可用: ${CG_VER:-未知版本}"
+    if codegraph_build_works "$SCRIPT_DIR"; then
+        echo "   codegraph build 检测通过；知识库生成前会先 preflight，自检为大项目时询问后再 build"
+    else
+        echo "⚠️  CodeGraph CLI 可用但 build 失败（常见于 Windows better-sqlite3）"
+        echo "   知识库将降级为索引优先扫描；修复见 docs/CodeGraph 安装指南.md"
+    fi
 elif codegraph_broken_install; then
     echo "⚠️  检测到 CodeGraph 已安装但 CLI 不可用（native binding 失败或损坏）"
     echo "   如需修复，见 docs/CodeGraph 安装指南.md"
-    echo "   不影响 Autopilot 流程，知识库 Skill 会跳过 codegraph 改用全量扫描"
+    echo "   不影响 DevPilot 流程，知识库 Skill 会跳过 codegraph 改用全量扫描"
 else
     echo "ℹ️  未安装 CodeGraph（可选加速工具，不安装不影响流程）"
     echo "   作用：知识库生成加速 70-80%、变更影响精确分析、死代码检测"
@@ -299,11 +304,11 @@ echo "  方式二：在框架目录下启动 Claude Code（自动激活）"
 echo "    cd $SCRIPT_DIR"
 echo "    claude"
 echo ""
-echo "启动后看到「✅ Autopilot 智能流水线 v$(cat "$SCRIPT_DIR/VERSION") — 就绪」表示成功。"
+echo "启动后看到「✅ DevPilot 智能流水线 v$(cat "$SCRIPT_DIR/VERSION") — 就绪」表示成功。"
 echo ""
 echo "常用触发关键字："
 echo "  需求分析：功能描述，目标项目：D:\\my-project"
-echo "  /jit-project-autopilot-status        → 查看项目状态"
+echo "  /jit-project-devpilot-status        → 查看项目状态"
 echo "  /jit-project-knowledge-base          → 生成项目知识库"
 echo "  /jit-devpilot-init                   → 激活流水线"
 echo "  /jit-env-auto-setup                  → 环境检测与配置"

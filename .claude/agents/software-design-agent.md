@@ -62,18 +62,13 @@ L 级设计 MUST 合并 HLD+LLD 于同一份 `03-software-design.md`（见根 CL
 - `03-software-design.md` 必须包含方案取舍记录：选中方案、拒绝方案、理由、风险
 - `03a-change-strategy.md` 的批次计划 MUST 引用 `03-software-design.md` 章节号，不得重新设计
 - 任务 4.5 未确认时，不得启动前后端/数据库并行实现
-- `03-software-design.md` MUST 包含知识库锚点和“预计知识库变更范围”
+- `03-software-design.md` MUST 包含「预计知识库变更范围」小节
+- 知识库锚点统一写入 `CHANGELOG.md` 的 `## 知识库锚点` section，不在 03 文档内重复（锚点格式见 `docs/KNOWLEDGE_BASE_RULES.md` 规则 3）
 - 完成后等待用户确认再进入任务 6
 
-知识库锚点模板：
+预计知识库变更范围模板：
 
 ```markdown
-## 知识库锚点
-- 关联知识库版本：PROJECT_KNOWLEDGE_DETAIL.md @ vX.Y
-- 关联模块域：...
-- 关联流程图：...
-- 预计变更：...
-
 ## 预计知识库变更范围
 - DETAIL 模块域：
 - PUML 文件：

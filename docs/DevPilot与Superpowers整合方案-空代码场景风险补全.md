@@ -85,7 +85,7 @@ DevPilot（项目级骨架）          Superpowers（任务级方法论）
 
 DevPilot 的 CLAUDE.md 明确规定：
 
-> 外部技能只能在阶段内部被调用：Superpowers 等外部技能只能在 Autopilot 流程的某个阶段内部被调用，作为该阶段的执行工具
+> 外部技能只能在阶段内部被调用：Superpowers 等外部技能只能在 DevPilot 流程的某个阶段内部被调用，作为该阶段的执行工具
 
 整合方式：**DevPilot 管阶段切换，Superpowers 在阶段内兜底执行质量**。不冲突，叠加增益。
 

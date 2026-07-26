@@ -41,17 +41,8 @@ color: blue
 5. **待澄清疑问项**
 6. **变更级别评估**（S/M/L）+ 判定依据 + 等待用户确认
 7. **Superpowers brainstorming 证据**：隐式假设、非功能追问、客户未说明风险
-8. **知识库锚点**：若知识库存在，必须记录版本、关联模块域、关联流程图、预计变更
 
-知识库锚点模板：
-
-```markdown
-## 知识库锚点
-- 关联知识库版本：PROJECT_KNOWLEDGE_DETAIL.md @ vX.Y
-- 关联模块域：...
-- 关联流程图：...
-- 预计变更：...
-```
+> 知识库锚点统一写入 `CHANGELOG.md` 的 `## 知识库锚点` section，不在 01 文档内重复。锚点格式见 `docs/KNOWLEDGE_BASE_RULES.md` 规则 3。
 
 ## Superpowers 增强（阶段内）
 

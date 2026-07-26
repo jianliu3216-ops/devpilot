@@ -1,6 +1,6 @@
 # DevPilot 在 Claude Code 中的使用指南
 
-> 目标：在**目标项目目录**启动 Claude Code，完整走通 Autopilot 流水线，不依赖框架目录下的 `/van` 与 `@agent` 发现。
+> 目标：在**目标项目目录**启动 Claude Code，完整走通 DevPilot 流水线，不依赖框架目录下的 `/van` 与 `@agent` 发现。
 
 ---
 
@@ -50,7 +50,9 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 | 8 报告 | `测试报告` | — | 主会话 + Agent 委派 |
 | 8.5 KB 增量 | `知识库更新` | — | `/jit-project-knowledge-base-update` |
 | 9 变更 | `需求变更` | `change-request-agent.md` | 主会话 + Agent 委派 |
-| — 状态 | `查看状态` | — | `/jit-project-autopilot-status` |
+| — 状态 | `查看状态` | — | `/jit-project-devpilot-status` |
+
+任务 2（知识库）进入 Skill 后必须先执行 `preflight-kb` 轻量自检，展示源码文件数、项目体积、是否大项目和 CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才可执行 `codegraph build`。
 
 ---
 
@@ -59,7 +61,7 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 新开会话或切换项目后，用状态 Skill **恢复上下文并列出全部需求**（不是单个需求摘要）：
 
 ```
-/jit-project-autopilot-status
+/jit-project-devpilot-status
 ```
 
 或：
@@ -79,7 +81,7 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 可执行扫描（推荐在 Skill 内调用）：
 
 ```bash
-node "$FRAMEWORK/skills/jit-project-autopilot-status/scripts/scan-status.js" "D:\your-project"
+node "$FRAMEWORK/skills/jit-project-devpilot-status/scripts/scan-status.js" "D:\your-project"
 ```
 
 输出为 Markdown 表格：每个需求的级别、状态、当前阶段、缺失文档；并标注 KB 与 docs 不一致的孤儿项。
@@ -115,7 +117,7 @@ claude
 
 ```
 /jit-devpilot-init
-/jit-project-autopilot-status
+/jit-project-devpilot-status
 生成知识库，目标项目：D:\your-project
 需求分析：xxx，目标项目：D:\your-project
 生成PRD
@@ -137,4 +139,4 @@ bash install.sh          # 安装 Skills + 记录 devpilot-framework-path
 bash update-skills.sh    # 更新 Skills + 刷新 framework-path
 ```
 
-安装后 `jit-*` Skill 位于 `~/.claude/skills/`（含 devpilot-init、project-knowledge-base、project-knowledge-base-update、project-autopilot-status、env-auto-setup、ui-ux-pro-max、nowTimeAndModel 等）。
+安装后 `jit-*` Skill 位于 `~/.claude/skills/`（含 devpilot-init、project-knowledge-base、project-knowledge-base-update、project-devpilot-status、env-auto-setup、ui-ux-pro-max、nowTimeAndModel 等）。

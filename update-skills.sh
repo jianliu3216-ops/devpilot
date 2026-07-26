@@ -1,5 +1,5 @@
 #!/bin/bash
-# Autopilot Skill 更新脚本
+# DevPilot Skill 更新脚本
 # 作用：备份旧 jit-* Skill → 删除 → 从当前工程重新安装
 # 用法：bash update-skills.sh
 
@@ -9,7 +9,7 @@ SKILLS_DST="$HOME/.claude/skills"
 BACKUP_DIR="$HOME/.claude/skills_backup_$(date +%Y%m%d_%H%M%S)"
 
 echo "========================================="
-echo "  Autopilot Skill 更新脚本"
+echo "  DevPilot Skill 更新脚本"
 echo "========================================="
 echo ""
 

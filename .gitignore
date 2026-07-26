@@ -27,3 +27,7 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# 外部 skill 临时安装（不提交到框架仓库，用户后续复制到 ~/.claude/skills/）
+skills/codex-ppt/
+skills/image-to-editable-ppt/

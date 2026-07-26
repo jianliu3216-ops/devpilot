@@ -1,8 +1,8 @@
-# Claude Code Autopilot 智能流水线工作规则
+# Claude Code DevPilot 智能流水线工作规则
 
 ## 会话持久化规则（SESSION PERSISTENCE — 激活后持续生效）
 
-**当 Autopilot 被激活后（通过 /jit-devpilot-init 或 `激活DevPilot` 等关键字），以下规则在当前会话的每一个用户消息中持续生效：**
+**当 DevPilot 被激活后（通过 /jit-devpilot-init 或 `激活DevPilot` 等关键字），以下规则在当前会话的每一个用户消息中持续生效：**
 
 1. **每个用户消息必须经过门控检查**：判断是否包含需求/变更意图
 2. **需求意图检测到后，MUST 执行需求标识确认协议**：建议标识 → 等待确认 → 创建00文件 → 才读代码
@@ -21,19 +21,26 @@
 
 ### 流程门控规则（FLOW GATE — 任何情况下不得违反）
 
-1. **Autopilot 流程优先于一切外部技能**：当用户输入匹配 Autopilot 流程关键字时（需求分析/PRD/软件设计/代码实现/测试用例/测试报告/需求变更），**必须先进入 Autopilot 流水线**，任何外部 Skill（包括 Superpowers 技能）不得跳过或抢占流水线阶段
-2. **外部技能只能在阶段内调用**：Superpowers 等外部技能只能在 Autopilot 流程的某个阶段**内部**被调用，作为该阶段的执行工具，绝不允许替代或绕过流水线
-3. **门控不可绕过**：无论外部技能描述多么匹配用户意图，只要 Autopilot 关键字触发，流程优先；即使匹配度 100%，也必须先走 Autopilot 门控
-4. **冲突裁决**：当 Superpowers 指令与 Autopilot 流程冲突时，Autopilot 流程**无条件优先**
+1. **DevPilot 流程优先于一切外部技能**：当用户输入匹配 DevPilot 流程关键字时（需求分析/PRD/软件设计/代码实现/测试用例/测试报告/需求变更），**必须先进入 DevPilot 流水线**，任何外部 Skill（包括 Superpowers 技能）不得跳过或抢占流水线阶段
+2. **外部技能只能在阶段内调用**：Superpowers 等外部技能只能在 DevPilot 流程的某个阶段**内部**被调用，作为该阶段的执行工具，绝不允许替代或绕过流水线
+3. **门控不可绕过**：无论外部技能描述多么匹配用户意图，只要 DevPilot 关键字触发，流程优先；即使匹配度 100%，也必须先走 DevPilot 门控
+4. **冲突裁决**：当 Superpowers 指令与 DevPilot 流程冲突时，DevPilot 流程**无条件优先**
 5. **需求标识确认优先于代码探索**：检测到需求意图后，MUST 先确认需求标识并创建 00 文件，**禁止**在标识确认前读取任何源码或需求文档
 6. **Superpowers 输出证据要求**：阶段内调用 Superpowers 时，MUST 记录触发阶段、使用 skill、输入材料、输出证据；没有输出证据视为未执行
 7. **质量门禁优先于阶段推进**：若 Superpowers review / verification / TDD 门禁未通过，MUST 停在当前阶段，修复或请用户确认，不得进入下一阶段
 
-**根 CLAUDE.md > 外部技能 > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 Autopilot 流程的唯一行为规则源。
+**根 CLAUDE.md > 外部技能 > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 DevPilot 流程的唯一行为规则源。
 
 ## 流程触发规则
 - **必须先读取本框架根目录的 README.md**（即 `$FRAMEWORK/README.md`，非目标项目的 README.md），以 README.md 为流程的唯一事实源
 - 如果知识库存在，后续所有任务必须参考知识库理解项目
+  - **必读清单**（任务3 需求分析步骤 ④.1 MUST 主动读取，详见 cicd-rules.md §4）：
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`（整体架构 + 技术栈约束）
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`（模块字典 + 协议路由表 + 相关模块域章节）
+    - 相关 PUML 流程图（按需求涉及模块选择，如 security_flow / key_hierarchy / four_way_handshake / ota_flow 等）
+    - 同领域专题文档（如 CRYPTO_INTL.md / PBKDF2_KEY_DERIVATION.md / CRYPTO_GM.md，按需求关键词匹配）
+  - **时机**：步骤 ③ 创建 00 文件后，步骤 ④ 需求分析开始时
+  - **门控限制**：知识库读取不受需求标识门控限制（与 `docs/{需求标识}/` 下的需求文档区分，详见 cicd-rules.md §1.2 反模式表）
 
 ### Superpowers 阶段内增强层
 
@@ -82,9 +89,11 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `/jit-devpilot-init` | 激活流水线（任意目录可用） |
 | `/jit-project-knowledge-base` | 生成项目知识库 |
 | `/jit-project-knowledge-base-update` | 任务8.5 知识库增量更新 |
-| `/jit-project-autopilot-status` | 查看项目状态 |
+| `/jit-project-devpilot-status` | 查看项目状态 |
 | `/jit-env-auto-setup` | Node环境自动检测与配置使用 |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计 |
+
+**任务2（知识库生成）硬规则**：拿到目标项目路径后，**必须先**执行 `preflight-kb.sh` / `preflight-kb.ps1` 做轻量自检，向用户展示源码文件数、项目体积、是否大项目、CodeGraph 状态和建议动作。若 `IS_LARGE_PROJECT=true`，必须先询问用户是否使用 CodeGraph；用户确认后才可执行 `--build`。`BUILD_OK`/`CACHED_OK` 时优先基于 `.codegraph/` 扫描；未安装、失败或用户拒绝时，必须提示耗时/上下文风险并记录降级原因。详见 `skills/jit-project-knowledge-base/SKILL.md` Phase 0.0–0.2。
 
 流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发，AI 读取 README.md 与 `docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 后，按“读取 `$FRAMEWORK/.claude/agents/{agent}.md` + 主会话执行或 Task 委派”的 DevPilot 协议执行。`/van` 仅用于框架目录下的 Collective 研究路径，不作为 DevPilot 功能开发入口。
 
@@ -113,9 +122,9 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `响应式`、`暗黑模式`、`动画`、`过渡`、`悬停`、`阴影`、`渐变`、`圆角` | `给这个组件加悬停动画效果` |
 
 **集成规则**：
-- 在 Autopilot 流程的**软件设计**阶段，涉及 UI 模块时自动调用 `jit-ui-ux-pro-max` 获取设计建议
+- 在 DevPilot 流程的**软件设计**阶段，涉及 UI 模块时自动调用 `jit-ui-ux-pro-max` 获取设计建议
 - 在**代码实现**阶段，编辑前端文件时自动调用 `jit-ui-ux-pro-max` 验证和改进 UI 代码
-- 也可独立使用：`/jit-ui-ux-pro-max` 或直接描述 UI 需求，无需走完整 Autopilot 流程
+- 也可独立使用：`/jit-ui-ux-pro-max` 或直接描述 UI 需求，无需走完整 DevPilot 流程
 - **注意**：`jit-ui-ux-pro-max` 的搜索脚本依赖 Python 3，如未安装则回退到内置设计知识
 
 ## 变更分级规则（全流程通用）
@@ -158,12 +167,12 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 ## 流程遵循
 严格按照以下阶段执行，每个阶段完成后必须等待用户确认才能进入下一阶段。
 
-> **🚨 强制规则**：匹配到关键字后，AI 必须进入 Autopilot 流水线。
+> **🚨 强制规则**：匹配到关键字后，AI 必须进入 DevPilot 流水线。
 > - 明确为功能开发/代码修改的需求 → 直接进入，无需确认
 > - 意图模糊（检查、审计、扫描、分析等）→ 提示用户确认是否走流水线
 
 ### 场景1：正常需求实现
-0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） → 1. 需求分析 → 🔴分级评估确认 → 2. PRD → 确认 ✓ → 3. 软件/策略设计 → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
+0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） -> **0.5 读知识库**（BASE + DETAIL + 相关 PUML + 同领域专题文档，详见 cicd-rules.md §4 步骤 ④.1） → 1. 需求分析（结合知识库理解项目） → 🔴分级评估确认 → 2. PRD（结合知识库技术栈约束） → 确认 ✓ → 3. 软件/策略设计（参考已有 PUML 流程图） → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
 
 ### 场景2：需求变更
 9.1 描述变更 → 9.2 变更影响分析+🔴分级评估 → 9.3 确认变更范围和级别 → 9.4 按级别流程执行 → ... → 测试报告 → 知识库增量更新
@@ -173,8 +182,9 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 - 增量更新：只更新本次变更涉及的章节，不需要全量重扫整个项目
 - 知识库文档必须包含更新记录表：版本、日期、变更范围、说明
 - **MUST 更新需求索引表**：知识库维护需求索引表，每条需求一行，含标识、中文名、级别、涉及模块、版本
-- **MUST 在 00-原始需求.md 追加知识库锚点**：知识库版本、涉及模块域
+- **MUST 在 CHANGELOG.md 追加知识库锚点**：知识库版本、涉及模块域（锚点统一在 CHANGELOG.md 维护，不在 00/01/02/03 等开发文档内重复）
 - 首次生成知识库（任务2）是全量扫描，后续所有更新都是增量
+- **任务2 前置**：生成知识库前 MUST 运行 `skills/jit-project-knowledge-base/scripts/preflight-kb.sh`（或 `.ps1`）做轻量自检；大项目 MUST 先询问用户是否使用 CodeGraph，确认后才可 `codegraph build`
 
 ## 需求变更规则
 - 用户只需描述变更内容，AI 自动分析变更影响范围
