@@ -19,14 +19,16 @@ color: blue
 
 1. 建议需求标识（kebab-case）→ 等待用户确认
 2. 创建 `docs/{需求标识}/00-原始需求.md` + `CHANGELOG.md`
-3. **然后**才读取源码/知识库
+3. **然后**才读取源码/知识库。把知识库当当前事实前 MUST 先跑
+   `node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目>" --query "<当前需求关键词>"`
+   只引用 pass；fail 禁止当事实。
 
 ## 输入
 
 | 来源 | 路径 |
 |------|------|
 | 原始需求 | `docs/{需求标识}/00-原始需求.md` |
-| 知识库（可选） | `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`、`PROJECT_KNOWLEDGE_DETAIL.md` |
+| 知识库（可选） | 先跑事实门控；`PROJECT_KNOWLEDGE_ADMITTED.md` / `query-admit.md` 的 pass 为当前事实。BASE/DETAIL 作线索 |
 | 用户描述 | 会话中的功能/变更描述 |
 
 ## 输出
@@ -88,7 +90,7 @@ color: blue
 
 ## 执行步骤
 
-1. 读取知识库（若存在）理解项目架构，**不全量扫源码**
+1. 先跑事实门控（`verify-kb-facts.js --query`），再读准入 pass + BASE/DETAIL 线索理解架构；**禁止把 fail 当事实**；**不全量把源码读进上下文**（预言机脚本扫源码不等于把源码塞给模型）
 2. 执行 `brainstorming` 风险发散，记录输出证据
 3. 对照用户描述撰写需求分析
 4. 自动评估 S/M/L

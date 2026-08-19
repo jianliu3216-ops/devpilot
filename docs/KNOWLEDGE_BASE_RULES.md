@@ -1,6 +1,6 @@
 # 知识库贯穿规则（完整版）
 
-> 核心原则：知识库 = 单一事实源（Single Source of Truth），所有开发阶段都必须「先读知识库，再写知识库」
+> 核心原则：知识库 = 可检索的项目记忆；**进上下文的当前事实 = 代码预言机准入结果**。所有开发阶段都必须「先检索知识库，再经事实门控，再写知识库」。
 
 ---
 
@@ -128,3 +128,22 @@ title {流程图标题}
 | `docs/knowledge-base/*.puml` | 流程事实标准 | 实时，代码流程变了必须先更图 | P0 |
 | `PROJECT_KNOWLEDGE_DETAIL-*.md` | 深度备查手册 | 中频，核心模块变更时更新 | P1 |
 | `PROJECT_KNOWLEDGE_BASE.md` (BASE) | 快速入门索引 | 低频，重大架构变更时更新 | P2 |
+| `PROJECT_KNOWLEDGE_ADMITTED.md` | 代码预言机准入清单 | 每次生成/更新知识库后、每次注入上下文前刷新 | P0（引用事实时） |
+
+---
+
+## 规则 8：事实门控（注入上下文前 MUST）
+
+知识库 Markdown 仍是检索语料，**不是自动为真的事实**。Agent 把知识库内容当作「项目现在就是这样」之前，MUST 运行：
+
+```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目路径>" --query "<当前任务关键词>"
+```
+
+硬规则：
+
+- 只允许引用 `PROJECT_KNOWLEDGE_ADMITTED.md` / `query-admit.md` 中的 **pass** 断言
+- **fail** 已被当前源码证伪：禁止当事实；需要时下钻源码
+- 抽不出路径/符号/模块/路由/环境变量的叙述只作线索，引用前必须对照源码
+- 本规则不限制读取源码，不缩小知识库检索范围
+- 任务 2 生成后、任务 8.5 更新后也必须刷新准入文件

@@ -171,7 +171,7 @@ if [ "$INSTALL_SKILLS" = true ]; then
         echo "⚠️  未找到 Skills 文件，请确认 skills/ 目录结构正确"
         pause_exit 1
     fi
-    echo "已安装 $SKILL_COUNT 个 Skills（流水线激活 / 知识库 / 知识库更新 / 状态 / 环境 / UI / 时间模型）"
+    echo "已安装 $SKILL_COUNT 个 Skills（流水线激活 / 知识库 / 知识库更新 / 事实门控 / 状态 / 环境 / UI / 时间模型）"
 
     # 记录框架路径供 jit-devpilot-init skill 使用
     echo "$SCRIPT_DIR" > "$HOME/.claude/devpilot-framework-path"
@@ -310,6 +310,7 @@ echo "常用触发关键字："
 echo "  需求分析：功能描述，目标项目：D:\\my-project"
 echo "  /jit-project-devpilot-status        → 查看项目状态"
 echo "  /jit-project-knowledge-base          → 生成项目知识库"
+echo "  /jit-project-knowledge-fact-gate     → 知识库事实门控（注入前验真）"
 echo "  /jit-devpilot-init                   → 激活流水线"
 echo "  /jit-env-auto-setup                  → 环境检测与配置"
 echo "  ...更多命令见 快速入门.md"

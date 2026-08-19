@@ -71,9 +71,17 @@ node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目
 
 若校验出现 Error，必须修复后才算任务 8.5 完成；Warning 需要在输出中说明原因和后续处理建议。
 
+### 6. 刷新事实门控
+
+```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目路径>" --query "<本次需求标识或变更关键词>"
+```
+
+向用户报告 pass/fail。fail 表示刚写入的知识库仍有与源码不一致的可证伪字段，应修正 DETAIL 后重跑，或在输出中标明这些条目不得当事实。
+
 ## 输出
 
-告知用户更新的文件路径、版本号和 `validate-kb.js` 校验结果。**禁止**全量重扫整个项目（除非用户明确要求重建知识库）。
+告知用户更新的文件路径、版本号、`validate-kb.js` 校验结果和事实门控 pass/fail。**禁止**全量重扫整个项目（除非用户明确要求重建知识库）。
 
 ## 与任务 2 区别
 

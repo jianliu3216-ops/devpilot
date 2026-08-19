@@ -17,7 +17,7 @@ description: 在任何目录下激活 DevPilot 智能开发流水线。加载完
 2. `$FRAMEWORK/.claude-collective/cicd-rules.md`
 3. `$FRAMEWORK/docs/KNOWLEDGE_BASE_RULES.md`（知识库贯穿与增量更新规则）
 4. `$FRAMEWORK/docs/DEVPILOT_CLAUDE_CODE_GUIDE.md`（Claude Code 委派协议）
-5. `$FRAMEWORK/README.md`（按需查阅关键章节）
+5. `$FRAMEWORK/DEVPILOT.md`（按需查阅关键章节；流程事实源。根目录 README.md 是产品介绍，不是规则书）
 
 ### 第 2 步：输出操作菜单
 
@@ -45,9 +45,11 @@ description: 在任何目录下激活 DevPilot 智能开发流水线。加载完
 | `测试用例` / `回归验证` | 任务7：测试用例文档 |
 | `测试报告` / `运行测试` | 任务8：测试报告 |
 | `知识库更新` / `更新知识库` | 任务8.5：/jit-project-knowledge-base-update |
+| `知识库验真` / `事实门控` | 知识库事实门控：/jit-project-knowledge-fact-gate |
 | `需求变更：<需求标识> <变更描述>` | 任务9：变更影响分析 |
 | `/jit-env-auto-setup` | 检测 Node/Python/git 环境 |
 | `/jit-project-knowledge-base-update` | 知识库增量更新 |
+| `/jit-project-knowledge-fact-gate` | 知识库事实门控（注入前验真） |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计引擎 |
 | `/jit-nowTimeAndModel` | 查看日期时间与模型信息 |
 
@@ -91,13 +93,12 @@ description: 在任何目录下激活 DevPilot 智能开发流水线。加载完
     ▼
 ④ 进入需求分析 / 变更影响分析
     │
-    │  ④.1 **先读知识库**（MUST，详见 CLAUDE.md 流程触发规则必读清单 + cicd-rules.md §4 步骤 ④.1）：
-    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md（整体架构 + 技术栈约束）
-    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md（模块字典 + 协议路由表 + 相关模块域章节）
-    │      - 相关 PUML 流程图（按需求涉及模块选择）
-    │      - 同领域专题文档（按需求关键词匹配，如 CRYPTO_INTL.md / PBKDF2_KEY_DERIVATION.md）
+    │  ④.1 **先做知识库事实门控，再读知识库**（MUST，详见 CLAUDE.md + cicd-rules.md §4）：
+    │      - 运行 verify-kb-facts.js --query "<当前需求关键词>"
+    │      - 只把 PROJECT_KNOWLEDGE_ADMITTED.md / query-admit.md 的 pass 当当前事实
+    │      - fail 禁止当事实；BASE/DETAIL/PUML 作检索线索
     │  ④.2 然后读相关源码和需求文档
-    │  注：知识库读取不受需求标识门控限制（与 docs/{需求标识}/ 下的需求文档区分）
+    │  注：知识库读取不受需求标识门控限制；事实门控不限制读源码
     ▼
 ⑤ 🔴 分级评估 → 用户确认级别 → 按级别进入后续阶段
 ```
@@ -108,7 +109,7 @@ description: 在任何目录下激活 DevPilot 智能开发流水线。加载完
 |---------|------|---------|
 | ❌ 先读代码再确认标识 | 在需求标识确认前，**禁止**读取任何源码文件 | 用户说"追加唯一标识"，AI 直接去读 `.lua` 文件 |
 | ❌ 先读文档再确认标识 | 在需求标识确认前，**禁止**读取 `docs/{需求标识}/` 下的需求文档（00/01/02/03/05 等） | 用户说"改需求"，AI 先去读 `00-原始需求.md` |
-| ✅ 读取知识库 | `docs/knowledge-base/` 下的知识库（BASE/DETAIL/PUML）可随时读，作为项目背景理解，**不受门控限制**。需求分析阶段 MUST 主动读取 | 任意时机可读 `PROJECT_KNOWLEDGE_BASE.md` |
+| ✅ 读取知识库 | `docs/knowledge-base/` 可随时检索。当作当前事实前 MUST 先跑事实门控，只引用 pass | 任意时机可读知识库；引用路径/符号前必须有准入结果 |
 | ❌ 跳过标识直接分析 | 无论需求看起来多简单，**禁止**跳过标识确认 | 用户说"加个日志"，AI 直接改代码 |
 | ❌ 同时做多件事 | 标识确认阶段，**禁止**同时探索代码、git log 等 | 用户说需求，AI 一边建议标识一边读代码 |
 | ❌ 替用户决定标识 | **禁止**不提示用户就直接使用某个标识 | AI 直接创建 `docs/xxx/` 目录 |

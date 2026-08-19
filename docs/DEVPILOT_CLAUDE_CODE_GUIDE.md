@@ -41,6 +41,7 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 | 任务 | 关键字 | Agent 文件 | Skill 备选 |
 |------|--------|-------------|-----------|
 | 2 知识库 | `生成知识库` | — | `/jit-project-knowledge-base` |
+| 2.5 事实门控 | `知识库验真` / 任务3–9 引用知识库前 | — | `/jit-project-knowledge-fact-gate` |
 | 3 需求分析 | `需求分析` | `requirements-analysis-agent.md` | 主会话 + Agent 委派 |
 | 4 PRD | `生成PRD` | `prd-generation-agent.md` | 主会话 + Agent 委派 |
 | 4.5 接口契约先行 | PRD 确认后高风险项目启用 | `software-design-agent.md` 或主会话 | 主会话 + Agent 委派 |
@@ -52,7 +53,7 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 | 9 变更 | `需求变更` | `change-request-agent.md` | 主会话 + Agent 委派 |
 | — 状态 | `查看状态` | — | `/jit-project-devpilot-status` |
 
-任务 2（知识库）进入 Skill 后必须先执行 `preflight-kb` 轻量自检，展示源码文件数、项目体积、是否大项目和 CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才可执行 `codegraph build`。
+任务 2（知识库）进入 Skill 后必须先执行 `preflight-kb` 轻量自检，展示源码文件数、项目体积、是否大项目和 CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才可执行 `codegraph build`。生成或增量更新后必须再跑 `verify-kb-facts.js` 刷新准入清单。任务 3/4/5/6/9 把知识库当当前事实前必须带 `--query` 跑事实门控，只引用 pass。
 
 ---
 

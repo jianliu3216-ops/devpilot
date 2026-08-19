@@ -113,6 +113,7 @@ CodeGraph：✅ .codegraph 已存在 / ⚠️ 大项目建议先运行 codegraph
 ```
 /jit-devpilot-init                  → 激活流水线
 /jit-project-knowledge-base         → 生成知识库（任务2）
+/jit-project-knowledge-fact-gate    → 知识库事实门控（注入前验真）
 /jit-project-devpilot-status       → 查看状态（本 Skill）
 /jit-project-knowledge-base-update  → 知识库增量更新（任务8.5）
 /jit-env-auto-setup                 → 环境配置

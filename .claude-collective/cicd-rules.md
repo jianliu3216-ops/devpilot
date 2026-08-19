@@ -35,7 +35,8 @@
 |---------|:------:|---------|
 | 在需求标识确认前读取任何源码文件（.lua/.py/.go/.ts 等） | 🔴 严重 | 先确认标识，创建 00 文件，再读代码 |
 | 在需求标识确认前读取 `docs/{需求标识}/` 下的需求文档（00/01/02/03/05 等） | 🔴 严重 | 先确认标识，再读相关文档 |
-| 读取 `docs/knowledge-base/` 下的知识库（BASE/DETAIL/PUML 等） | ✅ **允许** | 知识库可随时读，作为项目背景理解，**不受门控限制**。需求分析阶段 MUST 主动读取 |
+| 读取 `docs/knowledge-base/` 下的知识库（BASE/DETAIL/PUML 等） | ✅ **允许** | 知识库可随时检索。当作**当前事实**前 MUST 先跑 `verify-kb-facts.js`，只引用 pass。不限制读源码 |
+| 把 BASE/DETAIL 里的路径/符号/模块不经验证直接当事实 | 🔴 严重 | 先跑事实门控，只引用 `PROJECT_KNOWLEDGE_ADMITTED.md` / `query-admit.md` 的 pass |
 | 跳过标识确认直接分析需求 | 🔴 严重 | 必须先建议标识，等用户确认 |
 | 标识确认的同时并行读取代码 | 🟡 违规 | 标识确认是独立步骤，不与代码探索并行 |
 | 不提示用户直接创建需求目录 | 🔴 严重 | 必须先展示标识建议，用户确认后再创建 |
@@ -47,7 +48,7 @@
 1. 我是否已经向用户建议了需求标识？ 如否 → 立即建议
 2. 用户是否已经确认了标识？ 如否 → 等待用户回复
 3. 我是否已经创建了 00-原始需求.md + CHANGELOG.md？ 如否 → 先创建再继续
-4. 进入步骤 ④ 需求分析前，是否已经读取知识库（BASE + DETAIL + 相关 PUML）？ 如否 -> 必须先读再分析
+4. 进入步骤 ④ 需求分析前，是否已经跑过事实门控并读取准入结果？ 如否 -> 必须先跑 `verify-kb-facts.js --query` 再分析
 
 ---
 
@@ -55,7 +56,7 @@
 
 | 关键字 | 触发任务 | 说明 |
 |-------|---------|------|
-| `需求：` `需求 ` `需求分析` `需求分析：` `分析需求` | 任务3 需求分析 | 读取 README.md + DevPilot 委派指南 → 读 Agent 文件执行 |
+| `需求：` `需求 ` `需求分析` `需求分析：` `分析需求` | 任务3 需求分析 | 读取 DEVPILOT.md + DevPilot 委派指南 → 读 Agent 文件执行 |
 | `生成PRD` `PRD` | 任务4 PRD | 同上 |
 | `软件设计` `变更策略` | 任务5 设计 | 同上 |
 | `代码实现` `开始编码` | 任务6 代码实现 | 同上 |
@@ -63,6 +64,7 @@
 | `测试报告` `运行测试` | 任务8 测试报告 | 同上 |
 | `需求变更` `变更需求` `需求变更：` | 任务9 需求变更 | 同上 |
 | `知识库更新` `更新知识库` | 任务8.5 知识库更新 | 走 jit-project-knowledge-base-update |
+| `知识库验真` `事实门控` `准入知识` | 知识库事实门控 | 走 jit-project-knowledge-fact-gate |
 | `生成知识库` `项目知识库` `PROJECT_KNOWLEDGE_BASE` | 任务2 知识库 | 走 jit-project-knowledge-base |
 | `查看状态` | 项目状态 | 走 jit-project-devpilot-status |
 | `激活DevPilot` `启动流水线` `devpilot` | 激活 DevPilot | 走 jit-devpilot-init |
@@ -133,13 +135,16 @@ AI:   [目标项目 D:\my-app 已记住] 需求标识建议：user-login...
     │
     ▼
 ④ 需求分析（按 S/M/L 级别控制深度）
-    │  ④.1 先读知识库（MUST，详见 CLAUDE.md 流程遵循章节必读清单）：
-    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md（整体架构 + 技术栈）
-    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md（模块字典 + 协议路由表 + 相关模块域章节）
+    │  ④.1 先做知识库事实门控，再读知识库（MUST）：
+    │      - 运行 node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目>" --query "<当前需求关键词>"
+    │      - 只把 PROJECT_KNOWLEDGE_ADMITTED.md / .verified/query-admit.md 的 pass 当当前事实
+    │      - fail 禁止当事实；需要时下钻源码
+    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md（结构线索，路径/符号以准入为准）
+    │      - docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md（模块线索，同上）
     │      - 相关 PUML 流程图（按需求涉及模块选择）
     │      - 同领域专题文档（如 CRYPTO_INTL.md / PBKDF2_KEY_DERIVATION.md，按需求关键词匹配）
     │  ④.2 然后读相关源码和需求文档
-    │  注：知识库读取不受需求标识门控限制（与 docs/{需求标识}/ 下的需求文档区分）
+    │  注：知识库读取不受需求标识门控限制；事实门控不限制读源码
     │
     ▼
 ⑤ 🔴 分级评估 → 用户确认级别 → 按级别进入后续阶段

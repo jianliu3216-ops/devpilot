@@ -15,7 +15,7 @@ color: green
 
 - `03-software-design.md`（+ `03a-change-strategy.md` 若 L 级）
 - `02a-interface-contract.md`（任务 4.5 启用时）
-- 知识库、PRD、需求分析
+- 知识库、PRD、需求分析（知识库路径/模块以事实门控 pass 为准，禁止引用 fail）
 - S/M/L 级别
 
 ## 职责
@@ -41,7 +41,7 @@ color: green
 
 ## 编码约束
 
-- 不改无关代码；匹配项目风格；参考知识库目录结构
+- 不改无关代码；匹配项目风格；参考知识库目录结构（以 ADMITTED pass 为准）
 - 产出写入目标项目源码目录
 
 ## Superpowers 增强（阶段内）

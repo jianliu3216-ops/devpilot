@@ -15,7 +15,8 @@ color: purple
 
 - `02-prd.md`、`01-requirements-analysis.md`
 - `02a-interface-contract.md`（任务 4.5 启用时 MUST 引用）
-- `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`（若存在 MUST 引用）
+- `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`（若存在：先跑事实门控，路径/符号/模块以 ADMITTED pass 为准）
+- `docs/knowledge-base/PROJECT_KNOWLEDGE_ADMITTED.md`（若存在 MUST 作为当前事实）
 - `docs/knowledge-base/*.puml`（MUST 引用已有流程图）
 - S/M/L 级别
 

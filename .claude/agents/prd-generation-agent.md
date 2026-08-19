@@ -18,7 +18,8 @@ color: blue
 ## 输入
 
 - `docs/{需求标识}/01-requirements-analysis.md`
-- `docs/knowledge-base/PROJECT_KNOWLEDGE_*.md`（可选）
+- `docs/knowledge-base/PROJECT_KNOWLEDGE_*.md`（可选；路径/符号/模块以事实门控 pass 为准）
+- `docs/knowledge-base/PROJECT_KNOWLEDGE_ADMITTED.md`（若存在，当前事实）
 - 已确认的 S/M/L 级别
 
 ## 输出

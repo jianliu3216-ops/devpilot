@@ -2,7 +2,7 @@
 
 > 汇报完整版 · 每页 = 一页 PPT 的内容
 >
-> 注意：本文为历史汇报材料，不是当前执行规则源。当前执行规则以根目录 `CLAUDE.md`、`README.md`、`docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 和各 `jit-*` Skill 为准。当前版本测试范围仅支持单元测试；集成测试、E2E、Playwright 属于后续版本规划。
+> 注意：本文为历史汇报材料，不是当前执行规则源。当前执行规则以根目录 `CLAUDE.md`、`DEVPILOT.md`、`docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 和各 `jit-*` Skill 为准。根目录 `README.md` 是产品介绍，不是流程规则书。当前版本测试范围仅支持单元测试；集成测试、E2E、Playwright 属于后续版本规划。
 
 ---
 
@@ -518,7 +518,8 @@ DevPilot 不是"自定义了几个 Claude Code Skill"，而是一套完整的四
 | `CLAUDE.md` | 最高 | 流程门控不可绕过、触发关键字表、分级规则、质量要求 |
 | `cicd-rules.md` | 会话注入 | 输出路径规则、目标项目自动识别、00-原始需求模板、分级判定表 |
 | `DECISION.md` | 会话注入 | 自动委派决策引擎（什么情况走什么 Agent） |
-| `README.md` | 事实源 | 完整流程说明，跨文件一致性锚点 |
+| `DEVPILOT.md` | 事实源 | 完整流程说明，跨文件一致性锚点 |
+| `README.md` | 产品介绍 | GitHub / 人类入口，不是流程规则书 |
 
 **优先级链**：`CLAUDE.md > 外部技能 > cicd-rules.md > 其他规则文件`
 
@@ -539,7 +540,7 @@ DevPilot 不是"自定义了几个 Claude Code Skill"，而是一套完整的四
 
 ### Layer 4 - Agent（执行层）
 
-`/van` 命令读取 `README.md` 确定当前阶段的执行规范，从 `agents.md` 的 15+ 专业化 Agent 中选择合适的分派任务：
+`/van` 命令读取 `DEVPILOT.md` 确定当前阶段的执行规范，从 `agents.md` 的 15+ 专业化 Agent 中选择合适的分派任务：
 
 | Agent | 职责 | 适用阶段 |
 |------|------|---------|
@@ -671,7 +672,7 @@ DevPilot 不是黑盒。团队可根据技术栈和流程规范定制：
 | 添加项目专属 Skill | `skills/` 目录新增 `SKILL.md` | ⭐⭐ |
 | 调整 Agent 分派策略 | `.claude-collective/agents.md` | ⭐⭐ |
 | 添加自定义 Hook | `.claude/hooks/` 新增脚本 | ⭐⭐⭐ |
-| 修改流程阶段顺序 | `CLAUDE.md` + `README.md` + `cicd-rules.md` 三处同步 | ⭐⭐⭐ |
+| 修改流程阶段顺序 | `CLAUDE.md` + `DEVPILOT.md` + `cicd-rules.md` 三处同步 | ⭐⭐⭐ |
 | 扩展知识库扫描策略 | `skills/jit-project-knowledge-base/SKILL.md` | ⭐⭐⭐ |
 
 ### 典型定制场景
@@ -703,7 +704,8 @@ claude-code-autopilot/
 │   └── agents.md                # Agent 定义：加领域专属 Agent
 ├── .claude/hooks/               # Hook 脚本：加自定义阶段门控
 ├── skills/                      # 入口 Skill：加项目专属命令
-└── README.md                    # 流程事实源：改流程时必同步
+├── README.md                    # 产品介绍：GitHub / 人类入口
+└── DEVPILOT.md                  # 流程事实源：改流程时必同步
 ```
 
 ---

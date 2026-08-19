@@ -14,7 +14,7 @@ color: orange
 ## 输入
 
 - 已有 `docs/{需求标识}/` 全套文档
-- 知识库 DETAIL
+- 知识库 DETAIL + 事实门控准入结果（`verify-kb-facts.js --query` 后的 pass；fail 不得当事实）
 - 用户变更描述
 
 ## 输出

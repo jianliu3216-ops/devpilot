@@ -32,15 +32,20 @@
 **根 CLAUDE.md > 外部技能 > .claude-collective/CLAUDE.md > 其他规则文件**。本文件是 DevPilot 流程的唯一行为规则源。
 
 ## 流程触发规则
-- **必须先读取本框架根目录的 README.md**（即 `$FRAMEWORK/README.md`，非目标项目的 README.md），以 README.md 为流程的唯一事实源
+- **必须先读取本框架根目录的 DEVPILOT.md**（即 `$FRAMEWORK/DEVPILOT.md`，非目标项目的 README.md），以 DEVPILOT.md 为流程的唯一事实源。根目录 `README.md` 是给人看的产品介绍，不是流程规则书。
 - 如果知识库存在，后续所有任务必须参考知识库理解项目
+  - **事实门控（MUST，先于把知识库当当前事实）**：运行
+    `node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目>" --query "<当前任务关键词>"`
+    只允许把 `PROJECT_KNOWLEDGE_ADMITTED.md` / `.verified/query-admit.md` 中 **pass** 断言写入分析上下文；**fail** 禁止当事实，需要时下钻源码。原始 BASE/DETAIL 可检索结构，不得绕过门控把其中的路径/符号/模块直接当事实。
   - **必读清单**（任务3 需求分析步骤 ④.1 MUST 主动读取，详见 cicd-rules.md §4）：
-    - `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`（整体架构 + 技术栈约束）
-    - `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`（模块字典 + 协议路由表 + 相关模块域章节）
+    - 先跑事实门控（带当前需求 `--query`）
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_ADMITTED.md` 或 `.verified/query-admit.md`（准入事实）
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`（整体架构线索，引用路径/符号前以准入结果为准）
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md`（模块字典线索，同上）
     - 相关 PUML 流程图（按需求涉及模块选择，如 security_flow / key_hierarchy / four_way_handshake / ota_flow 等）
     - 同领域专题文档（如 CRYPTO_INTL.md / PBKDF2_KEY_DERIVATION.md / CRYPTO_GM.md，按需求关键词匹配）
   - **时机**：步骤 ③ 创建 00 文件后，步骤 ④ 需求分析开始时
-  - **门控限制**：知识库读取不受需求标识门控限制（与 `docs/{需求标识}/` 下的需求文档区分，详见 cicd-rules.md §1.2 反模式表）
+  - **门控限制**：知识库读取不受需求标识门控限制（与 `docs/{需求标识}/` 下的需求文档区分，详见 cicd-rules.md §1.2 反模式表）；事实门控不限制读源码
 
 ### Superpowers 阶段内增强层
 
@@ -78,6 +83,7 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `测试用例`、`生成测试用例`、`回归验证` | 任务7 测试用例 | `确认代码，生成测试用例` |
 | `测试报告`、`生成测试报告`、`运行测试` | 任务8 测试报告 | `确认用例，生成测试报告` |
 | `知识库更新`、`更新知识库` | 任务8.5 知识库更新 | `更新知识库` |
+| `知识库验真`、`事实门控`、`准入知识` | 知识库事实门控 | `知识库验真` |
 | `需求变更`、`变更需求`、`需求变更：` | 任务9 需求变更 | `需求变更：user-login 增加忘记密码` |
 | `生成知识库`、`项目知识库`、`PROJECT_KNOWLEDGE_BASE` | 任务2 知识库生成 | `生成知识库`（首次需 `目标项目：路径`） |
 | `激活DevPilot`、`启动流水线`、`devpilot` | 激活 DevPilot | `/jit-devpilot-init` |
@@ -89,13 +95,14 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `/jit-devpilot-init` | 激活流水线（任意目录可用） |
 | `/jit-project-knowledge-base` | 生成项目知识库 |
 | `/jit-project-knowledge-base-update` | 任务8.5 知识库增量更新 |
+| `/jit-project-knowledge-fact-gate` | 知识库事实门控（注入上下文前验真） |
 | `/jit-project-devpilot-status` | 查看项目状态 |
 | `/jit-env-auto-setup` | Node环境自动检测与配置使用 |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计 |
 
 **任务2（知识库生成）硬规则**：拿到目标项目路径后，**必须先**执行 `preflight-kb.sh` / `preflight-kb.ps1` 做轻量自检，向用户展示源码文件数、项目体积、是否大项目、CodeGraph 状态和建议动作。若 `IS_LARGE_PROJECT=true`，必须先询问用户是否使用 CodeGraph；用户确认后才可执行 `--build`。`BUILD_OK`/`CACHED_OK` 时优先基于 `.codegraph/` 扫描；未安装、失败或用户拒绝时，必须提示耗时/上下文风险并记录降级原因。详见 `skills/jit-project-knowledge-base/SKILL.md` Phase 0.0–0.2。
 
-流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发，AI 读取 README.md 与 `docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 后，按“读取 `$FRAMEWORK/.claude/agents/{agent}.md` + 主会话执行或 Task 委派”的 DevPilot 协议执行。`/van` 仅用于框架目录下的 Collective 研究路径，不作为 DevPilot 功能开发入口。
+流程阶段（需求分析/PRD/设计/代码/测试）通过自然语言触发，AI 读取 DEVPILOT.md 与 `docs/DEVPILOT_CLAUDE_CODE_GUIDE.md` 后，按“读取 `$FRAMEWORK/.claude/agents/{agent}.md` + 主会话执行或 Task 委派”的 DevPilot 协议执行。`/van` 仅用于框架目录下的 Collective 研究路径，不作为 DevPilot 功能开发入口。
 
 ### 触发方式三：传统任务编号（向后兼容）
 
@@ -172,7 +179,7 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 > - 意图模糊（检查、审计、扫描、分析等）→ 提示用户确认是否走流水线
 
 ### 场景1：正常需求实现
-0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） -> **0.5 读知识库**（BASE + DETAIL + 相关 PUML + 同领域专题文档，详见 cicd-rules.md §4 步骤 ④.1） → 1. 需求分析（结合知识库理解项目） → 🔴分级评估确认 → 2. PRD（结合知识库技术栈约束） → 确认 ✓ → 3. 软件/策略设计（参考已有 PUML 流程图） → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
+0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） -> **0.5 事实门控 + 读知识库**（先跑 `verify-kb-facts.js --query`，只把 pass 当当前事实；BASE/DETAIL/PUML 作检索线索，详见 cicd-rules.md §4 步骤 ④.1） → 1. 需求分析（结合准入知识理解项目） → 🔴分级评估确认 → 2. PRD（结合知识库技术栈约束） → 确认 ✓ → 3. 软件/策略设计（参考已有 PUML 流程图） → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
 
 ### 场景2：需求变更
 9.1 描述变更 → 9.2 变更影响分析+🔴分级评估 → 9.3 确认变更范围和级别 → 9.4 按级别流程执行 → ... → 测试报告 → 知识库增量更新
@@ -185,6 +192,7 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 - **MUST 在 CHANGELOG.md 追加知识库锚点**：知识库版本、涉及模块域（锚点统一在 CHANGELOG.md 维护，不在 00/01/02/03 等开发文档内重复）
 - 首次生成知识库（任务2）是全量扫描，后续所有更新都是增量
 - **任务2 前置**：生成知识库前 MUST 运行 `skills/jit-project-knowledge-base/scripts/preflight-kb.sh`（或 `.ps1`）做轻量自检；大项目 MUST 先询问用户是否使用 CodeGraph，确认后才可 `codegraph build`
+- **任务2/8.5 后置**：结构校验 `validate-kb.js` 通过后 MUST 再跑 `verify-kb-facts.js` 刷新准入清单
 
 ## 需求变更规则
 - 用户只需描述变更内容，AI 自动分析变更影响范围

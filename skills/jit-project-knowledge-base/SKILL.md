@@ -707,6 +707,14 @@ node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目
 
 校验结果必须写入交付说明。若存在 Error，知识库不算完成；`--strict` 下大项目缺少 `.codegraph/` 视为 Error（除非用户明确选择降级扫描，且 BASE 中已记录降级原因）。
 
+结构校验通过后 MUST 再跑事实门控，刷新准入清单（可无 `--query`）：
+
+```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目绝对路径>"
+```
+
+fail 断言写入交付说明即可，不阻断知识库生成完成；但后续任务引用知识库事实时只能用 pass。
+
 ---
 
 ## 最终交付（Final Deliverable）
