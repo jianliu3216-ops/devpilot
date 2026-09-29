@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill 评估报告 — jit-project-devpilot-status</title>
+<style>
+  body { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; max-width: 960px; margin: 24px auto; padding: 0 16px; color: #24292f; }
+  h1 { font-size: 22px; border-bottom: 2px solid #eaecef; padding-bottom: 8px; }
+  h2 { font-size: 18px; margin-top: 28px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  th, td { border: 1px solid #d0d7de; padding: 8px 10px; text-align: left; font-size: 14px; }
+  th { background: #f6f8fa; }
+  td.detail { color: #57606a; font-size: 13px; }
+  .pass { color: #1a7f37; font-weight: 600; }
+  .fail { color: #cf222e; font-weight: 600; }
+  .score { font-size: 40px; font-weight: 700; color: #0969da; }
+  .score-sub { color: #57606a; font-size: 14px; }
+  .hint { color: #57606a; font-size: 13px; }
+  pre { background: #f6f8fa; padding: 10px; border-radius: 6px; font-size: 12px; overflow-x: auto; }
+  code { background: #f6f8fa; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  ul { font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>Skill 评估报告</h1>
+  <p>Skill：<code>jit-project-devpilot-status</code> · 路径：<code>L:\jit\devpilot\skills\jit-project-devpilot-status</code> · 评估日期：2026-08-20</p>
+  <p>Rubric 得分率：<span class="score">83.3%</span>
+     <span class="score-sub">（5/6 项通过，确定性静态检查，零 LLM 成本）</span></p>
+
+  <h2>静态检查明细</h2>
+  <table>
+    <tr><th>#</th><th>检查项</th><th>状态</th><th>详情</th></tr>
+        <tr>
+        <td>1</td>
+        <td>frontmatter 完整性</td>
+        <td class="pass">✅ PASS</td>
+        <td class="detail">name=jit-project-devpilot-status · description=有 · 含触发描述=否</td>
+      </tr>
+        <tr>
+        <td>2</td>
+        <td>必备章节</td>
+        <td class="pass">✅ PASS</td>
+        <td class="detail">触发/执行/产出 齐全</td>
+      </tr>
+        <tr>
+        <td>3</td>
+        <td>脚本引用存在性</td>
+        <td class="fail">❌ FAIL</td>
+        <td class="detail">引用 2 个 · 缺失 1 个 · 目录实际 1 个 .js</td>
+      </tr>
+        <tr>
+        <td>4</td>
+        <td>脚本语法 node --check</td>
+        <td class="pass">✅ PASS</td>
+        <td class="detail">全部 1 个脚本语法通过</td>
+      </tr>
+        <tr>
+        <td>5</td>
+        <td>触发词与 CLAUDE.md 一致</td>
+        <td class="pass">✅ PASS</td>
+        <td class="detail">抽取触发词 目录/列出/全部/需求的状态 · CLAUDE.md 命中 2 个</td>
+      </tr>
+        <tr>
+        <td>6</td>
+        <td>相对路径引用可解析</td>
+        <td class="pass">✅ PASS</td>
+        <td class="detail">所有相对引用均可解析</td>
+      </tr>
+  </table>
+
+  <h2>LLM 冒烟结果</h2>
+      <table class="smoke">
+        <tr><td class="pass">✅ 通过</td></tr>
+        <tr><td><b>执行命令：</b><code>node scan-status.js &lt;临时项目&gt;</code></td></tr>
+        <tr><td><b>耗时：</b>186 ms</td></tr>
+        <tr><td><b>输出要点：</b><pre># 📊 DevPilot 项目状态总览
+项目路径: C:/Users/LV/AppData/Local/Temp/devpilot-compress-test
+扫描时间: 2026-08-20T00:38:33Z
+
+📊 项目状态总览</pre></td></tr>
+      </table>
+
+  <h2>修复建议</h2>
+  <ul>
+        <li>脚本引用存在性：引用 2 个 · 缺失 1 个 · 目录实际 1 个 .js</li>
+      </ul>
+</body>
+</html>

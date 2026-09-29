@@ -377,3 +377,13 @@ Before delivering UI code, verify these items:
 - [ ] Form inputs have labels
 - [ ] Color is not the only indicator
 - [ ] `prefers-reduced-motion` respected
+
+## 产出
+
+| 输出 | 说明 |
+|------|------|
+| 设计系统文件 | 项目约定的设计 token（配色 / 字体 / 间距 / 圆角等），优先复用现有文件，必要时新建 |
+| UI 代码 | 按设计系统改造的 `.html` / `.css` / 组件代码，遵循触发时的技术栈 |
+| 设计说明 | 关键设计决策的理由（可用性、性能、可访问性取舍） |
+
+产出写入当前被设计的目标项目/文件，不写入框架目录。

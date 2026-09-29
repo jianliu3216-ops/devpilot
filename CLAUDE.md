@@ -87,6 +87,7 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `需求变更`、`变更需求`、`需求变更：` | 任务9 需求变更 | `需求变更：user-login 增加忘记密码` |
 | `生成知识库`、`项目知识库`、`PROJECT_KNOWLEDGE_BASE` | 任务2 知识库生成 | `生成知识库`（首次需 `目标项目：路径`） |
 | `激活DevPilot`、`启动流水线`、`devpilot` | 激活 DevPilot | `/jit-devpilot-init` |
+| `环境配置`、`环境自动配置`、`环境检测` | 环境自动配置 | `/jit-env-auto-setup` |
 
 ### 触发方式二：Skill 命令（/ 开头，可发现）
 
@@ -99,6 +100,8 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 | `/jit-project-devpilot-status` | 查看项目状态 |
 | `/jit-env-auto-setup` | Node环境自动检测与配置使用 |
 | `/jit-ui-ux-pro-max` | UI/UX 智能设计 |
+| `/jit-skill-eval` | Skill 科学评估（静态检查 + LLM 冒烟，HTML 报告到 docs/skill-eval/） |
+| `/jit-context-compress` | 阶段间上下文压缩（生成 handoff 压缩包，省 token） |
 
 **任务2（知识库生成）硬规则**：拿到目标项目路径后，**必须先**执行 `preflight-kb.sh` / `preflight-kb.ps1` 做轻量自检，向用户展示源码文件数、项目体积、是否大项目、CodeGraph 状态和建议动作。若 `IS_LARGE_PROJECT=true`，必须先询问用户是否使用 CodeGraph；用户确认后才可执行 `--build`。`BUILD_OK`/`CACHED_OK` 时优先基于 `.codegraph/` 扫描；未安装、失败或用户拒绝时，必须提示耗时/上下文风险并记录降级原因。详见 `skills/jit-project-knowledge-base/SKILL.md` Phase 0.0–0.2。
 
@@ -180,6 +183,10 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 
 ### 场景1：正常需求实现
 0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） -> **0.5 事实门控 + 读知识库**（先跑 `verify-kb-facts.js --query`，只把 pass 当当前事实；BASE/DETAIL/PUML 作检索线索，详见 cicd-rules.md §4 步骤 ④.1） → 1. 需求分析（结合准入知识理解项目） → 🔴分级评估确认 → 2. PRD（结合知识库技术栈约束） → 确认 ✓ → 3. 软件/策略设计（参考已有 PUML 流程图） → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
+
+**阶段间上下文压缩规则（阶段推进 MUST）**：进入新阶段前，先运行
+`node "$FRAMEWORK/skills/jit-context-compress/scripts/compress-handoff.js" "<目标项目>" "<需求标识>" "<目标阶段>"`（prd/design/build/test/report/kb）
+生成 `docs/{需求标识}/.handoff/{阶段}.context.md`；AI **只读压缩包**恢复前序上下文 + 按「按需下钻建议」读原文档章节，**禁止全文复读前序文档**。源文档哈希未变时脚本自动复用旧包（详见 `/jit-context-compress`）。
 
 ### 场景2：需求变更
 9.1 描述变更 → 9.2 变更影响分析+🔴分级评估 → 9.3 确认变更范围和级别 → 9.4 按级别流程执行 → ... → 测试报告 → 知识库增量更新

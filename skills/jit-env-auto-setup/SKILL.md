@@ -87,3 +87,15 @@ description: 自动配置 Node.js 环境变量和工具路径。检测已安装�
 ```bash
 NODE_PATH=$HOME/.claude/tools/node-libs/node_modules node your_script.js
 ```
+
+---
+
+## 产出
+
+| 输出 | 说明 |
+|------|------|
+| 环境检测报告 | 检测到的 Node.js 版本、npm、已安装工具清单（人可读文本） |
+| 环境变量设置 | 本次会话可用的 `NODE_PATH` / `PATH` 配置（仅当前 Bash 会话有效） |
+| 工具路径记录 | 检测到的 node_modules、Python 包等工具所在路径 |
+
+不写入任何持久化文件；环境配置仅作用于当前会话。
