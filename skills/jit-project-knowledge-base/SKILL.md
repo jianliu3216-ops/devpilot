@@ -699,9 +699,10 @@ docs/knowledge-base/
 
 ### Phase 8 - 知识库结构校验（生成后 MUST）
 
-知识库文档写入完成后执行：
+知识库文档写入完成后，**先生成机器索引，再校验**（顺序不可颠倒，缺 INDEX 时校验必报 Error）：
 
 ```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/build-index.js" "<目标项目绝对路径>"
 node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>"
 # 大项目且用户选择 CodeGraph 或 preflight 曾为 BUILD_OK/CACHED_OK 时，建议加 --strict
 node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>" --strict
@@ -730,11 +731,11 @@ fail 断言写入交付说明即可，不阻断知识库生成完成；但后续
 > - PUML 文件：多个独立流程图文件，每个流程一个文件
 > - **机器索引（2.6.0 起）**：`PROJECT_KNOWLEDGE_INDEX.md/.json` = 机器检索主入口，由 `scripts/build-index.js` 生成
 
-**任务2 合格定义（2.6.0 起）**：无 `PROJECT_KNOWLEDGE_INDEX.md/.json` 即任务2 失败（validate-kb.js 会报 error）。生成完三层文件后必须运行：
+**任务2 合格定义（2.6.0 起）**：无 `PROJECT_KNOWLEDGE_INDEX.md/.json` 即任务2 失败（validate-kb.js 会报 error）。INDEX 由 Phase 8 第一条命令生成。
 
-```bash
-node skills/jit-project-knowledge-base/scripts/build-index.js <目标项目>
-```
+**BASE 必须有模块表，INDEX 才抽得出模块**：`build-index.js` 只从 BASE 中标题含「模块」的 `##` 章节（可带编号、可拆成多个 `###` 小节）下的表格抽模块。表头需含「模块名/模块/组件/服务/名称」之一作为模块名列；「关键源文件/路径/文件」列作为 `paths`；「业务含义/业务描述/说明」列作为 `title`。按本 Skill 的 BASE 模板（`## N. 模块业务字典`）生成即满足。
+
+**存量项目（已有 BASE/DETAIL、无 INDEX）**：只跑 Phase 8 的 `build-index.js` + `validate-kb.js` + `verify-kb-facts.js`，**禁止**为补 INDEX 重跑全量扫描。
 
 ### 机器索引规格（PROJECT_KNOWLEDGE_INDEX）
 

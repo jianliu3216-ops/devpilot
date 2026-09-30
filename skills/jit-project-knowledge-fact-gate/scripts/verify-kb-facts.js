@@ -402,7 +402,8 @@ function collectKbFiles() {
   if (!exists(kbDir)) return [];
   return walk(kbDir, (filePath, name) => {
     const rel = posixRel(filePath);
-    if (rel.includes("/.verified/") || name === "PROJECT_KNOWLEDGE_ADMITTED.md") return false;
+    // ADMITTED and INDEX are generated from the other KB files; verifying them would double-count claims.
+    if (rel.includes("/.verified/") || name === "PROJECT_KNOWLEDGE_ADMITTED.md" || name === "PROJECT_KNOWLEDGE_INDEX.md") return false;
     return /\.(md|puml)$/i.test(name);
   });
 }

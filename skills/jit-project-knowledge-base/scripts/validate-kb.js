@@ -94,19 +94,24 @@ if (detail) {
 // 2.6.0: machine index files are mandatory task-2 outputs.
 const indexMdPath = path.join(kbDir, "PROJECT_KNOWLEDGE_INDEX.md");
 const indexJsonPath = path.join(kbDir, "PROJECT_KNOWLEDGE_INDEX.json");
+const buildIndexHint = "Run build-index.js (seconds, reads BASE/DETAIL only; no full KB rescan needed).";
 if (!exists(indexMdPath)) {
-  errors.push("Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.md. Run build-index.js.");
+  errors.push(`Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.md. ${buildIndexHint}`);
 }
 if (!exists(indexJsonPath)) {
-  errors.push("Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.json. Run build-index.js.");
+  errors.push(`Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.json. ${buildIndexHint}`);
 } else {
   try {
     const indexJson = JSON.parse(readText(indexJsonPath));
-    const baseVersion = (readText(basePath).match(/v\d+\.\d+(\.\d+)?/) || [])[0];
+    const baseText = readText(basePath);
+    const baseVersion = ((baseText.match(/知识库版本[^\n]*?v?(\d+\.\d+(?:\.\d+)?)/) || baseText.match(/v(\d+\.\d+(?:\.\d+)?)/)) || [])[1];
     if (indexJson.kb_version === "unknown") {
       warnings.push("PROJECT_KNOWLEDGE_INDEX.json kb_version is unknown; rebuild with build-index.js.");
-    } else if (baseVersion && indexJson.kb_version !== baseVersion.replace(/^v/, "")) {
+    } else if (baseVersion && indexJson.kb_version !== baseVersion) {
       warnings.push(`PROJECT_KNOWLEDGE_INDEX.json kb_version (${indexJson.kb_version}) does not match BASE version (${baseVersion}). Rebuild with build-index.js.`);
+    }
+    if (!Array.isArray(indexJson.modules) || indexJson.modules.length === 0) {
+      warnings.push("PROJECT_KNOWLEDGE_INDEX.json has no modules; BASE module table is missing or unreadable.");
     }
   } catch (parseError) {
     errors.push(`PROJECT_KNOWLEDGE_INDEX.json is not valid JSON: ${parseError.message}`);
@@ -145,7 +150,7 @@ if (baseContent && !/##\s+CodeGraph\s+状态/.test(baseContent)) {
   warnings.push("PROJECT_KNOWLEDGE_BASE.md missing section: ## CodeGraph 状态");
 }
 // 2.6.0 骨架限制（规划 §7.2）：BASE 必须有模块表章节，否则视为超长叙述未骨架化
-if (baseContent && !/##\s+模块/.test(baseContent)) {
+if (baseContent && !/^##\s+(?:\d+[.、]\s*)?.*模块/m.test(baseContent)) {
   warnings.push("PROJECT_KNOWLEDGE_BASE.md missing module table (## 模块*). BASE must stay a skeleton: overview/stack/module table/pointers; long narrative goes to DETAIL.");
 }
 

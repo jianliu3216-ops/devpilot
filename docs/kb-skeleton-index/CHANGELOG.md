@@ -16,4 +16,5 @@
 | 2026-09-30 | 代码实现 | 新增 scripts/build-index.js；validate-kb.js 增 INDEX 检查与版本 warning；SKILL.md 合格定义+INDEX 规格+验收 3 项；KNOWLEDGE_BASE_RULES 规则 9/10；CLAUDE.md 必读清单首查 INDEX |
 | 2026-09-30 | 测试 | 夹具自测 13/13 通过 + node --check；产出 04/05 |
 | 2026-09-30 | 知识库更新 | 框架仓无知识库文档（无库可更）；增量更新体现为规则层文件本身 + 规划 §12 状态表 |
+| 2026-09-30 | 真实知识库复查修复 | 用 `L:\jit` 下 10 个真实项目知识库副本实测，原抽取逻辑按自造夹具编写、不适配真实格式：modules 误把 DETAIL 章节（目录/API 接口清单等）当模块；模块表检查不认带编号标题（`## 3. 模块业务字典`）导致全部误报；需求级别全 unknown、`api/` 等普通目录被当需求。重写：从 BASE 模块章节全部表格（含 ### 分表、跳过代码块）按表头列抽 id/title/paths；DETAIL 小节只接受以模块名开头或整词出现的标题（防误链）；需求取 DETAIL 需求索引 + 含 00/01 的目录，级别与 scan-status 同一套正则；kb_version 优先「知识库版本」行。回归：9/10 项目模块路径完整、有需求索引的项目级别全识别；剩余 unknown 均核实为原文缺失。另修：Phase 8 与 8.5 步骤补「先 build-index 再 validate」（原顺序必报 Error、原命令为相对路径）；事实门控排除 INDEX.md 防重复计数；status 对缺 INDEX 引导「更新知识库」而非重建 |
 | 2026-09-30 | 规划核对补漏 | 按规划 §7.2「超长 BASE 无模块表视为失败」补 validate-kb 模块表检查（warning）+ SKILL 验收项；夹具验证通过 |

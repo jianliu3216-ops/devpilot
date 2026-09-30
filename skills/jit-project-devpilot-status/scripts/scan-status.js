@@ -217,7 +217,7 @@ console.log(`| 文件 | 状态 |`);
 console.log(`|------|------|`);
 console.log(`| PROJECT_KNOWLEDGE_BASE.md | ${exists(kbBase) ? "✅" : "❌ 缺失"} |`);
 console.log(`| PROJECT_KNOWLEDGE_DETAIL.md | ${exists(kbDetail) ? "✅" : "❌ 缺失"} |`);
-console.log(`| PROJECT_KNOWLEDGE_INDEX.json | ${indexIds !== null ? (indexIds.size ? `✅ ${indexIds.size} 条` : "⚠️ 空索引") : "❌ 缺失（跑 build-index.js）"} |`);
+console.log(`| PROJECT_KNOWLEDGE_INDEX.json | ${indexIds !== null ? (indexIds.size ? `✅ ${indexIds.size} 条` : "⚠️ 空索引") : "❌ 缺失（说「更新知识库」补建，秒级，不重扫）"} |`);
 console.log(`| 需求索引表 | ${kbIndex.length ? `✅ ${kbIndex.length} 条` : "⚠️ DETAIL 无索引表"} |`);
 console.log(`| CodeGraph | ${exists(codegraphDir) ? "✅ .codegraph 已存在" : "⚠️ 未发现 .codegraph（大项目建议先运行 codegraph build）"} |\n`);
 

@@ -205,10 +205,15 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 node "$FRAMEWORK/skills/jit-devpilot-init/scripts/devpilot-guard.js" "<目标项目>" "<需求标识>" check "<目标阶段>"
 ```
 
+- **新需求建档**：00 文件创建后执行 `--init`（状态为 `waiting_confirm`）
+- **用户在对话中确认后**执行 `--confirm`；**用户确认级别时**执行 `--confirm <S|M|L>`（写入级别，只升不降；S 级自动登记跳过 prd/design/test_cases）。未得到用户明确确认，禁止执行 `--confirm`
 - `PASS` → 该阶段产出经**用户确认**后，再执行 `--apply "<目标阶段>"` 更新 `docs/{需求标识}/state.yaml`（唯一写者=guard）
 - `[HARD STOP] 缺少: …` → 停在当前阶段，按输出补齐证据；**禁止**手改 state.yaml 跳阶段
-- `waiting_confirm` 时 `--apply` 一律拒绝（人工确认门控优先）
+- `waiting_confirm` 时 check / `--apply` 一律拒绝（人工确认门控优先，先 `--confirm`）
+- 进入 analysis 不要求级别；analysis 之后的阶段必须已 `--confirm <级别>`
 - S 级 skipped 阶段（prd/design/test_cases）不要求证据文件
+
+典型 S 级顺序：`--init` → 用户确认标识 → `--confirm` → `check analysis` → 写 01 → `--apply analysis` → 用户确认 S → `--confirm S` → `check impl` → 改代码 → `--apply impl` → 有 `tests/{标识}/` → `--apply report`（写 05）→ `--apply kb_update` → `--apply done`
 - 会话中断恢复：`resume` 命令 → 只读 state 输出 + `.handoff/{phase}.context.md`（法律 L2）；禁止为恢复而全量生成知识库或重读 00–05 全文
 - 旧需求无 state.yaml：走推断模式（status 扫描），可选 `--init [S|M|L]` 补建
 - 本仓无知识库的框架级需求可豁免 check 的知识库类证据，但 00–05 证据文件校验不可豁免

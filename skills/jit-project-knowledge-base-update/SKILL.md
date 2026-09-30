@@ -85,11 +85,14 @@ description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求
 - [ ] BASE/DETAIL/PUML 版本号一致
 - [ ] 白名单外文件零改动
 
-### 5. 运行知识库校验
+### 5. 重建机器索引并校验
 
 ```bash
+node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/build-index.js" "<目标项目路径>"
 node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目路径>"
 ```
+
+`build-index.js` 从当前 BASE/DETAIL/需求目录全量重建 INDEX（秒级，不扫源码），所以步骤 2 更新的 DETAIL 需求索引行会自动进入 INDEX，无需手改 JSON。
 
 若校验出现 Error，必须修复后才算任务 8.5 完成；Warning 需要在输出中说明原因和后续处理建议。
 

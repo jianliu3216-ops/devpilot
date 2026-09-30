@@ -10,7 +10,11 @@
  *   node devpilot-guard.js <项目根> <需求标识> check <target>
  *   node devpilot-guard.js <项目根> <需求标识> --apply <target>
  *   node devpilot-guard.js <项目根> <需求标识> --init [S|M|L]
+ *   node devpilot-guard.js <项目根> <需求标识> --confirm [S|M|L]
  *   node devpilot-guard.js <项目根> <需求标识> resume
+ *
+ * --confirm：只在用户于对话中明确确认后执行。清除 waiting_confirm；带级别时写入/升级级别
+ *            （只升不降），S 级自动登记 skipped: [prd, design, test_cases]。
  *
  * 退出码：0 成功/PASS；1 FAIL/HARD STOP/错误。
  */
@@ -260,10 +264,12 @@ function check(projectRoot, reqId, target, state) {
   if (state.status === "done") {
     return { ok: false, missing: ["需求已 done"] };
   }
-  const level = state.level;
-  if (!levelConfirmed(state)) {
-    return { ok: false, missing: ["级别未确认（state.level 为 null），先完成分级确认"] };
+  // 级别在需求分析阶段才评估，进入 analysis 及之前不要求级别；之后的阶段必须已确认级别。
+  const needsLevel = PHASE_ORDER.indexOf(target) > PHASE_ORDER.indexOf("analysis");
+  if (needsLevel && !levelConfirmed(state)) {
+    return { ok: false, missing: ["级别未确认（state.level 为 null），先完成分级确认并执行 --confirm <S|M|L>"] };
   }
+  const level = state.level || "M";
   const required = REQUIRED[target] && REQUIRED[target][level];
   if (required === null) {
     return { ok: true, skipped: true, missing: [] };
@@ -348,6 +354,36 @@ function init(projectRoot, reqId, level) {
   console.log(`PASS: 已补建 state.yaml（phase=${state.phase}, level=${state.level || "未确认"}）`);
 }
 
+const LEVEL_RANK = { S: 1, M: 2, L: 3 };
+const S_SKIPPED = ["prd", "design", "test_cases"];
+
+function confirm(projectRoot, reqId, state, level) {
+  if (state.status === "done") fail("需求已 done，无需确认");
+  const before = { level: state.level, status: state.status };
+  if (level) {
+    if (!LEVEL_RANK[level]) fail(`非法级别: ${level}（仅 S/M/L）`);
+    if (state.level && LEVEL_RANK[level] < LEVEL_RANK[state.level]) {
+      fail(`级别只升不降：当前 ${state.level}，拒绝降为 ${level}`);
+    }
+    const passedAnalysis = PHASE_ORDER.indexOf(state.phase) > PHASE_ORDER.indexOf("analysis");
+    if (state.level === "S" && level !== "S" && passedAnalysis) {
+      console.log(`注意: S→${level} 升级发生在 ${state.phase} 阶段；prd/design/test_cases 不再跳过，需补齐对应文档后再推进`);
+    }
+    state.level = level;
+    state.skipped = level === "S"
+      ? [...new Set([...state.skipped, ...S_SKIPPED])]
+      : state.skipped.filter((p) => !S_SKIPPED.includes(p));
+  }
+  if (state.status === "waiting_confirm") state.status = "in_progress";
+  saveState(projectRoot, reqId, state);
+  appendEvent(projectRoot, reqId, {
+    ts: nowIso(), from: state.phase, to: state.phase, level: state.level,
+    confirm: { level_before: before.level, status_before: before.status },
+    evidence: state.evidence, via: "--confirm",
+  });
+  console.log(`PASS: 已记录用户确认（level=${state.level || "未确认"}, status=${state.status}${state.skipped.length ? `, skipped=[${state.skipped.join(", ")}]` : ""}）`);
+}
+
 function resume(projectRoot, reqId, state) {
   const next = nextTargets(state);
   console.log(`id: ${state.id}`);
@@ -355,7 +391,7 @@ function resume(projectRoot, reqId, state) {
   console.log(`phase: ${state.phase}`);
   console.log(`status: ${state.status}`);
   if (state.status === "waiting_confirm") {
-    console.log(`下一动作: 等待用户确认 ${state.phase}；确认后由流水线执行 --apply`);
+    console.log(`下一动作: 等待用户确认 ${state.phase}；用户确认后执行 --confirm [S|M|L]，再按阶段 check / --apply`);
   } else {
     console.log(`下一动作: 进入 ${next[0]}（先 guard check，产出经用户确认后 --apply）`);
     const handoff = path.join(projectRoot, "docs", reqId, ".handoff", `${state.phase}.context.md`);
@@ -374,7 +410,7 @@ function main() {
   const args = process.argv.slice(2);
   const [projectRoot, reqId, cmd, ...rest] = args;
   if (!projectRoot || !reqId) {
-    fail("用法: node devpilot-guard.js <项目根> <需求标识> <check <target> | --apply <target> | --init [S|M|L] | resume>");
+    fail("用法: node devpilot-guard.js <项目根> <需求标识> <check <target> | --apply <target> | --init [S|M|L] | --confirm [S|M|L] | resume>");
   }
   if (!fs.existsSync(path.join(projectRoot, "docs", reqId))) {
     fail(`需求目录不存在: docs/${reqId}/（先完成标识确认与 00 文件）`);
@@ -392,6 +428,11 @@ function main() {
 
   if (cmd === "resume") {
     resume(projectRoot, reqId, state);
+    return;
+  }
+
+  if (cmd === "--confirm") {
+    confirm(projectRoot, reqId, state, rest[0]);
     return;
   }
 

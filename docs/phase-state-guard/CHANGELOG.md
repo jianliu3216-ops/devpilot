@@ -11,6 +11,7 @@
 
 | 日期 | 变更 | 说明 |
 |------|------|------|
+| 2026-09-30 | 可用性复查修复（阻断级） | 按真实调用顺序（不手写 state.yaml）端到端测试时发现流程卡死：① 无命令记录用户确认，`--init` 后 waiting_confirm 永远拒绝 --apply；② check 对 analysis 也要求级别，而级别在分析阶段才评估；③ S 级跳过阶段无人登记。新增 `--confirm [S|M|L]`（清 waiting_confirm、写入/升级级别只升不降、S 自动 skipped），analysis 及之前不要求级别；CLAUDE.md/init SKILL/DEVPILOT.md/cicd-rules/03 设计同步。端到端 22/22 + 原夹具 11/11 通过 |
 | 2026-09-30 | B1–B5 全部完成：guard 脚本（四命令+规则表+审计+防漂移）、CLAUDE.md/cicd-rules/init/DEVPILOT.md/status 五处协议接入、04+04a+05 | 夹具 11/11、回归 R1–R6 通过；规划状态表已更新 |
 | 2026-09-30 | 创建 03a-change-strategy.md | B1–B5 批次、回滚（含 CLAUDE.md 临时回退点）、风险触发器 |
 | 2026-09-30 | 创建 03-software-design.md | HLD+LLD 合并：架构图、状态机、state/事件 schema、guard CLI、规则表、双轨防漂移 |

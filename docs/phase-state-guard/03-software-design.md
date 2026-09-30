@@ -121,6 +121,7 @@ REQUIRED[target][level] =
 node devpilot-guard.js <项目根> <需求标识> check <target>
 node devpilot-guard.js <项目根> <需求标识> --apply <target>
 node devpilot-guard.js <项目根> <需求标识> --init [S|M|L]
+node devpilot-guard.js <项目根> <需求标识> --confirm [S|M|L]
 node devpilot-guard.js <项目根> <需求标识> resume
 ```
 
@@ -128,6 +129,8 @@ node devpilot-guard.js <项目根> <需求标识> resume
 - `--apply`：先跑同参数 check，PASS 才更新 phase + 追加事件；FAIL 输出 HARD STOP 且退出码 1
 - `--init`：无 state 时按级别建初始 state（phase=original_req 或 identified）；已有 state 时拒绝（防覆盖）
 - `resume`：输出 `phase/level/status/下一动作`；status=waiting_confirm 时提示「等待用户确认 <phase>」
+- `--confirm [S|M|L]`（2026-09-30 补）：记录用户确认，清除 waiting_confirm；带级别时写入或升级级别（只升不降），S 级自动写 `skipped: [prd, design, test_cases]`，升级离开 S 时移除；事件 `via: "--confirm"`。只在用户对话中明确确认后执行
+- 级别要求（2026-09-30 补）：进入 analysis 及之前不要求级别（级别在分析阶段才评估）；analysis 之后的阶段要求级别已确认
 
 ## 8. 双轨防漂移（规划 §1.2 落地）
 

@@ -119,7 +119,7 @@ AI:   [目标项目 D:\my-app 已记住] 需求标识建议：user-login...
 
 > **事实门控适用范围（CLAUDE.md 注入法律 L1）**：任务 3/4/5/6/9 在把知识库内容当「当前事实」引用前，MUST 带 `--query` 运行 `verify-kb-facts.js`；任务3 在步骤 ④ 必跑。**禁止**把 BASE/DETAIL 整本或大段贴进上下文（详见 CLAUDE.md「注入法律」）。
 >
-> **阶段守卫（CLAUDE.md 2.5.0 起 MUST）**：各阶段推进前先跑 `devpilot-guard.js check <目标阶段>`，产出经用户确认后 `--apply`；`[HARD STOP]` 停当前阶段。waiting_confirm 时禁止 --apply。
+> **阶段守卫（CLAUDE.md 2.5.0 起 MUST）**：各阶段推进前先跑 `devpilot-guard.js check <目标阶段>`，产出经用户确认后 `--apply`；`[HARD STOP]` 停当前阶段。waiting_confirm 时禁止 --apply；用户确认标识/级别后执行 `--confirm [S|M|L]`。
 
 **每一步都是阻塞的，必须等待用户确认后才能进行下一步。**
 

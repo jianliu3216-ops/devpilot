@@ -707,7 +707,7 @@ AI 在首次分级点（任务3 或任务9.2）自动分析并输出分级结论
 
 > **S 级纪律**：确认 S 后跳过 02/03/04 文档；实现后仅出简要测试报告（必含：改动点清单、验证命令与结果、残留风险）+ 知识库增量更新。AI 不得自行把 S 升级为 M/L；仅当后续发现影响扩大时提示用户确认升级（只升不降）。
 >
-> **阶段守卫（2.5.0 起 MUST）**：各阶段推进前跑 `devpilot-guard.js check <目标阶段>`，确认后 `--apply` 更新 `docs/{需求标识}/state.yaml`（唯一写者=guard 脚本）；`[HARD STOP]` 停当前阶段；`waiting_confirm` 禁 `--apply`；会话中断用 `resume` 恢复。详见 CLAUDE.md「阶段守卫接入」。
+> **阶段守卫（2.5.0 起 MUST）**：各阶段推进前跑 `devpilot-guard.js check <目标阶段>`，确认后 `--apply` 更新 `docs/{需求标识}/state.yaml`（唯一写者=guard 脚本）；`[HARD STOP]` 停当前阶段；`waiting_confirm` 禁 `--apply`，用户确认后先 `--confirm [S|M|L]`；会话中断用 `resume` 恢复。详见 CLAUDE.md「阶段守卫接入」。
 
 ### L 级（大变更）流程详解
 

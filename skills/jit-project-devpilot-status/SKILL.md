@@ -42,6 +42,7 @@ description: 扫描目标项目 docs/ 与 tests/ 目录，列出**全部**需求
    ```bash
    node "$FRAMEWORK/skills/jit-project-knowledge-base/scripts/validate-kb.js" "<目标项目绝对路径>"
    ```
+   若仅报「Missing PROJECT_KNOWLEDGE_INDEX」（2.6.0 前生成的存量知识库），下一步建议写「说『更新知识库』补建索引（秒级，不重扫）」，**禁止**建议重新生成知识库。
 
 ### 步骤 2：输出状态 + 下一步建议
 
