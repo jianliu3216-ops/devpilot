@@ -136,7 +136,7 @@ AI: 需求【用户登录注册模块】英文标识建议：user-login
 DevPilot **推荐路径**（目标项目目录）：
 
 1. `/jit-devpilot-init` 激活
-2. 自然语言或 `/jit-*` Skill 驱动各任务
+2. 自然语言驱动各任务（主入口）；`/jit-*` Skill 为兼容入口，流水线内部自动调用
 3. Agent 通过 `$FRAMEWORK/.claude/agents/*.md` + Task 委派（见 [DEVPILOT_CLAUDE_CODE_GUIDE.md](docs/DEVPILOT_CLAUDE_CODE_GUIDE.md)）
 
 **可选**：在框架目录使用 `/van` 走 Collective 子 Agent 路由（研究/实验用途，非 DevPilot 主路径）。

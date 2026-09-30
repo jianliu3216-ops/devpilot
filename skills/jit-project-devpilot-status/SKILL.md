@@ -1,6 +1,6 @@
 ---
 name: jit-project-devpilot-status
-description: 扫描目标项目 docs/ 与 tests/ 目录，列出**全部**需求的状态（S/M/L 文档完整性、测试代码、变更中/暂停），输出结构化总览和下一步建议。新会话可替代 init 做恢复。
+description: 扫描目标项目 docs/ 与 tests/ 目录，列出**全部**需求的状态（S/M/L 文档完整性、测试代码、变更中/暂停），输出结构化总览和下一步建议。新会话可替代 init 做恢复。由 DevPilot 流水线内部调用；用户请使用自然语言：查看状态 / 查看进度。
 ---
 
 # DevPilot 智能流水线 - 状态

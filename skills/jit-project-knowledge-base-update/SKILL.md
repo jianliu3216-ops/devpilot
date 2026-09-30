@@ -1,6 +1,6 @@
 ---
 name: jit-project-knowledge-base-update
-description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求索引、函数清单、涉及模块，不全量重扫。在 Claude Code 中通过 /jit-project-knowledge-base-update 触发。
+description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求索引、函数清单、涉及模块，不全量重扫。由 DevPilot 流水线内部调用；用户请使用自然语言：知识库更新 / 更新知识库。
 ---
 
 # jit-project-knowledge-base-update — 知识库增量更新

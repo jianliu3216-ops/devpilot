@@ -1,6 +1,6 @@
 ---
 name: jit-project-knowledge-base
-description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md。生成前先轻量自检文件数/项目大小/CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才 build，不可用或拒绝时提示耗时风险并降级扫描。
+description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md。生成前先轻量自检文件数/项目大小/CodeGraph 状态；大项目必须先询问用户是否使用 CodeGraph，确认后才 build，不可用或拒绝时提示耗时风险并降级扫描。由 DevPilot 流水线内部调用；用户请使用自然语言：生成知识库 / 项目知识库。
 ---
 
 # 项目知识库构建（Project Knowledge Base Builder）

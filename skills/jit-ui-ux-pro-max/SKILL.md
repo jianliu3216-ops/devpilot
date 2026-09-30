@@ -1,6 +1,6 @@
 ---
 name: jit-ui-ux-pro-max
-description: UI/UX 智能设计引擎。覆盖 67 种设计风格、96 套配色、57 种字体配对、25 种图表、13 个技术栈（React/Vue/Svelte/Flutter/SwiftUI/Tailwind/shadcn 等）。用于界面设计、组件美化、样式优化、响应式布局、暗黑模式、动画过渡等前端开发场景。
+description: UI/UX 智能设计引擎。覆盖 67 种设计风格、96 套配色、57 种字体配对、25 种图表、13 个技术栈（React/Vue/Svelte/Flutter/SwiftUI/Tailwind/shadcn 等）。用于界面设计、组件美化、样式优化、响应式布局、暗黑模式、动画过渡等前端开发场景。由 DevPilot 流水线内部调用（设计/编码阶段涉及 UI 时自动激活）；用户请使用自然语言：描述 UI 需求（如「优化这个登录页面」）。
 ---
 # UI/UX Pro Max - Design Intelligence
 

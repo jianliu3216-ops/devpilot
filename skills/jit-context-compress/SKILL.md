@@ -1,6 +1,6 @@
 ---
 name: jit-context-compress
-description: DevPilot 阶段间上下文压缩。阶段推进时生成「章节骨架+要点+SHA256」压缩上下文包，AI 只读压缩包+按需下钻，不全文复读前序文档，省 token。自然语言：上下文压缩 / 压缩上下文 / handoff压缩。
+description: DevPilot 阶段间上下文压缩。阶段推进时生成「章节骨架+要点+SHA256」压缩上下文包，AI 只读压缩包+按需下钻，不全文复读前序文档，省 token。由 DevPilot 流水线内部自动调用（阶段推进时无需用户触发）；用户请使用自然语言：上下文压缩 / handoff压缩。
 ---
 
 # jit-context-compress — 阶段间上下文压缩

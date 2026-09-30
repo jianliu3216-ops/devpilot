@@ -83,7 +83,7 @@ PRD（S 级跳过）
 | 生成测试用例 | `测试用例` |
 | 跑测试出报告 | `测试报告` |
 | 修改已有需求 | `需求变更：<标识> <描述>` |
-| 查看进度 | `/jit-project-devpilot-status` |
+| 查看进度 | `查看状态`（兼容命令：`/jit-project-devpilot-status`） |
 
 ---
 

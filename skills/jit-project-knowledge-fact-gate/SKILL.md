@@ -1,6 +1,6 @@
 ---
 name: jit-project-knowledge-fact-gate
-description: DevPilot 知识库事实门控。用代码预言机核验知识库可证伪断言，注入上下文前只放行 pass。自然语言：知识库验真 / 事实门控 / 准入知识。
+description: DevPilot 知识库事实门控。用代码预言机核验知识库可证伪断言，注入上下文前只放行 pass。由 DevPilot 流水线内部调用；用户请使用自然语言：知识库验真 / 事实门控 / 准入知识。
 ---
 
 # jit-project-knowledge-fact-gate — 知识库事实门控

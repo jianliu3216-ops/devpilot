@@ -38,7 +38,7 @@ Skill 会读取 `~/.claude/devpilot-framework-path` 加载 `$FRAMEWORK/CLAUDE.md
 
 > **Claude Code 委派说明**：Claude Code 里 `@agent` 不会被自动发现，**以「读 Agent 文件 + 主会话执行」为准**。`Task(generalPurpose)` 注入 agent md 全文是 Claude Code 的实现方式之一；在 Cursor / 其他 IDE 里可改为直接读文件后由主会话按 agent 规范执行。两种方式都必须严格遵循 agent md 中的规则。
 
-| 任务 | 关键字 | Agent 文件 | Skill 备选 |
+| 任务 | 关键字 | Agent 文件 | Skill 备选（兼容入口，NL 为主） |
 |------|--------|-------------|-----------|
 | 2 知识库 | `生成知识库` | — | `/jit-project-knowledge-base` |
 | 2.5 事实门控 | `知识库验真` / 任务3–9 引用知识库前 | — | `/jit-project-knowledge-fact-gate` |

@@ -1,6 +1,6 @@
 ---
 name: jit-skill-eval
-description: DevPilot Skill 科学评估。静态确定性检查 + 可选 LLM 冒烟，输出 HTML 报告到 docs/skill-eval/。自然语言：评估技能 / skill评估 / skill eval。
+description: DevPilot Skill 科学评估。静态确定性检查 + 可选 LLM 冒烟，输出 HTML 报告到 docs/skill-eval/。由 DevPilot 流水线内部调用（维护者用）；用户请使用自然语言：评估技能 / skill评估。
 ---
 
 # jit-skill-eval — Skill 科学评估

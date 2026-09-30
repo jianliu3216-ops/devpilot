@@ -1,6 +1,6 @@
 ---
 name: jit-env-auto-setup
-description: 自动配置 Node.js 环境变量和工具路径。检测已安装的 node_modules、Python 包、以及其他常用工具，无需每次对话手动确认工具位置。
+description: 自动配置 Node.js 环境变量和工具路径。检测已安装的 node_modules、Python 包、以及其他常用工具，无需每次对话手动确认工具位置。由 DevPilot 流水线内部调用；用户请使用自然语言：环境配置 / 环境检测。
 ---
 
 # 环境自动配置（Env Auto Setup）
