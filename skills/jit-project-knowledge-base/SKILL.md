@@ -872,6 +872,7 @@ node skills/jit-project-knowledge-base/scripts/build-index.js <目标项目>
 - [ ] **`PROJECT_KNOWLEDGE_INDEX.md/.json` 已生成**（运行 `build-index.js`；缺任一 = 任务2 失败）
 - [ ] **INDEX.json kb_version 与 BASE 版本号一致**（不一致 validate-kb 报 warning）
 - [ ] **INDEX 抽不出的字段均为 `unknown`，无编造内容**
+- [ ] **BASE 有模块表（骨架章节），无超长业务叙述**（超长叙述已下沉 DETAIL；validate-kb 对缺模块表报 warning）
 
 ---
 

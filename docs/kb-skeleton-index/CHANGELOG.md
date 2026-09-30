@@ -16,3 +16,4 @@
 | 2026-09-30 | 代码实现 | 新增 scripts/build-index.js；validate-kb.js 增 INDEX 检查与版本 warning；SKILL.md 合格定义+INDEX 规格+验收 3 项；KNOWLEDGE_BASE_RULES 规则 9/10；CLAUDE.md 必读清单首查 INDEX |
 | 2026-09-30 | 测试 | 夹具自测 13/13 通过 + node --check；产出 04/05 |
 | 2026-09-30 | 知识库更新 | 框架仓无知识库文档（无库可更）；增量更新体现为规则层文件本身 + 规划 §12 状态表 |
+| 2026-09-30 | 规划核对补漏 | 按规划 §7.2「超长 BASE 无模块表视为失败」补 validate-kb 模块表检查（warning）+ SKILL 验收项；夹具验证通过 |

@@ -144,6 +144,10 @@ const baseContent = readText(basePath);
 if (baseContent && !/##\s+CodeGraph\s+状态/.test(baseContent)) {
   warnings.push("PROJECT_KNOWLEDGE_BASE.md missing section: ## CodeGraph 状态");
 }
+// 2.6.0 骨架限制（规划 §7.2）：BASE 必须有模块表章节，否则视为超长叙述未骨架化
+if (baseContent && !/##\s+模块/.test(baseContent)) {
+  warnings.push("PROJECT_KNOWLEDGE_BASE.md missing module table (## 模块*). BASE must stay a skeleton: overview/stack/module table/pointers; long narrative goes to DETAIL.");
+}
 
 console.log("# DevPilot Knowledge Base Validation\n");
 console.log(`Project: ${projectRoot}`);
