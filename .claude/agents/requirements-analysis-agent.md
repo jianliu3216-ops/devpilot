@@ -90,7 +90,7 @@ color: blue
 
 ## 执行步骤
 
-1. 先跑事实门控（`verify-kb-facts.js --query`），再读准入 pass + BASE/DETAIL 线索理解架构；**禁止把 fail 当事实**；**不全量把源码读进上下文**（预言机脚本扫源码不等于把源码塞给模型）
+1. 先跑事实门控（`verify-kb-facts.js --query`），再读准入 pass + BASE/DETAIL 线索理解架构；**禁止把 fail 当事实**；**无 query pass 切片时禁止引用知识库路径/符号为事实，BASE/DETAIL 整本/大段禁止贴进上下文**（CLAUDE.md 注入法律 L1）；**不全量把源码读进上下文**（预言机脚本扫源码不等于把源码塞给模型）
 2. 执行 `brainstorming` 风险发散，记录输出证据
 3. 对照用户描述撰写需求分析
 4. 自动评估 S/M/L

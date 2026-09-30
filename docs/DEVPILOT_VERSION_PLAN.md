@@ -629,12 +629,12 @@ status 扫描：本次需求若已有 05，则 INDEX.requirements 必须有对�
 |------|------|----------|------|
 | 2.2.0 | 基线（已发布于本仓库 VERSION） | — | 双轨入口、规则型门控 |
 | 2.3.0 | **完成（报告已确认 2026-09-30）** | `docs/single-nl-entry/`（00–05 全套） | 含 R4 三层兜底 + 自定义描述循环；TC13–TC15 运行时冒烟随日常使用验证。下一版本：2.4.0 `default-fact-gate` |
-| 2.4.0 | 未开始 | 待确认 `default-fact-gate` | |
-| 2.5.0 | 未开始 | 待确认 `phase-state-guard` | L 级 |
-| 2.6.0 | 未开始 | 待确认 `kb-skeleton-index` | **补漏：骨架+机器索引，改原知识库形态** |
-| 2.7.0 | 未开始 | 待确认 `kb-incremental-ops` | 依赖 2.6 的 INDEX |
-| 2.8.0 | 可选 | 待定 | |
-| 3.0.0 | 阻塞于 2.7 | Placet | |
+| 2.4.0 | **完成（报告已确认 2026-09-30）** | `docs/default-fact-gate/`（00–05 全套） | 注入法律 L1–L3 落位；下一版本：2.5.0 `phase-state-guard`（L 级） |
+| 2.5.0 | **完成（报告确认，2026-09-30，用户授权免逐级确认连续执行）** | `docs/phase-state-guard/`（00–05 + 04a 全套） | guard 脚本 11/11 夹具通过；下一版本：2.6.0 `kb-skeleton-index` |
+| 2.6.0 | **完成（2026-09-30，用户授权免逐级确认连续执行）** | `docs/kb-skeleton-index/`（00–05 全套） | build-index.js 新增；validate-kb 缺 INDEX 报 error、版本 warning；规则 9/10 + CLAUDE.md 首查 INDEX；夹具 13/13 通过。下一版本：2.7.0 `kb-incremental-ops` |
+| 2.7.0 | **完成（2026-09-30，用户授权免逐级确认连续执行）** | `docs/kb-incremental-ops/`（00–05 全套） | 规则 11 日常增量禁令；8.5 白名单四项+禁改清单；scan-status 加 INDEX 条目检查（夹具 4/4）。下一版本：2.8.0 `compat-alias`（S 级） |
+| 2.8.0 | **完成（2026-09-30，S 级，与 2.7 同会话合并执行）** | `docs/compat-alias/`（00 + 简要 05） | 9/9 非 init SKILL 加自然语言兼容提示行（幂等）。下一版本：3.0.0 `placet-sync-en`（阻塞于 2.7 验证期，本轮不做） |
+| 3.0.0 | 阻塞于 2.3–2.7 真实小问题验证 | Placet | |
 
 **本文产出时未创建任何 `docs/{标识}/00-原始需求.md`。** 下一会话从确认 `single-nl-entry` 开始。
 

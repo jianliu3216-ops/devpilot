@@ -45,6 +45,7 @@
     `node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目>" --query "<当前任务关键词>"`
     只允许把 `PROJECT_KNOWLEDGE_ADMITTED.md` / `.verified/query-admit.md` 中 **pass** 断言写入分析上下文；**fail** 禁止当事实，需要时下钻源码。原始 BASE/DETAIL 可检索结构，不得绕过门控把其中的路径/符号/模块直接当事实。
   - **必读清单**（任务3 需求分析步骤 ④.1 MUST 主动读取，详见 cicd-rules.md §4）：
+    - `docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.json`（机器索引首查：先 INDEX 命中模块/需求，再按下述顺序）
     - 先跑事实门控（带当前需求 `--query`）
     - `docs/knowledge-base/PROJECT_KNOWLEDGE_ADMITTED.md` 或 `.verified/query-admit.md`（准入事实）
     - `docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md`（整体架构线索，引用路径/符号前以准入结果为准）
@@ -183,6 +184,35 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 5. **L 级测试两份都出**：`04-test-cases.md`（当前版本仅单元测试用例）+ `04a-regression-checklist.md`（单元测试回归清单）。不互相替代；接口/数据库/集成/E2E 测试留到后续版本
 6. **批次禁止重新设计**：`03a-change-strategy.md` 每个批次 MUST 引用 `03-software-design.md` 的章节号，不得在批次中重复或修改设计。架构决策在设计文档中一次性确定
 
+## 注入法律（CONTEXT INJECTION LAW — 任何阶段不得违反）
+
+**L1 知识库注入形态**：任务 3/4/5/6/9 在把知识库内容当「当前事实」引用前，MUST 已运行
+`node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.js" "<目标项目>" --query "<任务关键词>"`
+且只引用 ADMITTED / `.verified/query-admit.md` 的 **pass** 断言。
+**禁止**将 PROJECT_KNOWLEDGE_BASE.md / PROJECT_KNOWLEDGE_DETAIL*.md 全文或大段贴进上下文；BASE/DETAIL 仅作检索线索（先检索定位 → 再门控 → 再按需打开单个源码文件）。
+
+**L2 阶段推进压缩**：进入新阶段前 MUST 运行 `compress-handoff.js`（哈希未变自动复用），只读 `.handoff/*.context.md` + 按「按需下钻建议」打开章节；**禁止**全文复读 01/02/03/04/05 任一前序文档。
+
+**L3 S 级纪律**：用户确认 S 后跳过 02/03/04；代码实现后仅出简要测试报告（必含：改动点清单、验证命令与结果、残留风险）+ 知识库增量。**模型禁止以质量为由自行升级级别**；仅当后续发现影响扩大时提示用户确认升级（只升不降）。
+
+> 冲突澄清：前文「必读清单」语义 = 检索线索 + 先门控；与本法律冲突时以法律为准。
+
+### 阶段守卫接入（2.5.0 phase-state-guard — 阶段推进 MUST）
+
+进入新阶段前，MUST 先跑守卫脚本（证据文件存在性校验，只读不灌内容）：
+
+```bash
+node "$FRAMEWORK/skills/jit-devpilot-init/scripts/devpilot-guard.js" "<目标项目>" "<需求标识>" check "<目标阶段>"
+```
+
+- `PASS` → 该阶段产出经**用户确认**后，再执行 `--apply "<目标阶段>"` 更新 `docs/{需求标识}/state.yaml`（唯一写者=guard）
+- `[HARD STOP] 缺少: …` → 停在当前阶段，按输出补齐证据；**禁止**手改 state.yaml 跳阶段
+- `waiting_confirm` 时 `--apply` 一律拒绝（人工确认门控优先）
+- S 级 skipped 阶段（prd/design/test_cases）不要求证据文件
+- 会话中断恢复：`resume` 命令 → 只读 state 输出 + `.handoff/{phase}.context.md`（法律 L2）；禁止为恢复而全量生成知识库或重读 00–05 全文
+- 旧需求无 state.yaml：走推断模式（status 扫描），可选 `--init [S|M|L]` 补建
+- 本仓无知识库的框架级需求可豁免 check 的知识库类证据，但 00–05 证据文件校验不可豁免
+
 ## 流程遵循
 严格按照以下阶段执行，每个阶段完成后必须等待用户确认才能进入下一阶段。
 
@@ -193,6 +223,8 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 ### 场景1：正常需求实现
 0. **创建 00-原始需求.md + CHANGELOG.md**（需求标识确认后即刻创建，先于一切分析） -> **0.5 事实门控 + 读知识库**（先跑 `verify-kb-facts.js --query`，只把 pass 当当前事实；BASE/DETAIL/PUML 作检索线索，详见 cicd-rules.md §4 步骤 ④.1） → 1. 需求分析（结合准入知识理解项目） → 🔴分级评估确认 → 2. PRD（结合知识库技术栈约束） → 确认 ✓ → 3. 软件/策略设计（参考已有 PUML 流程图） → 确认 ✓ → 4. 代码实现 → 确认 ✓ → 5. 测试用例/回归验证 → 确认 ✓ → 6. 测试报告 → 确认 ✓ → 7. 知识库增量更新
 
+> **阶段守卫（2.5.0 起 MUST）**：上述每个「→」推进前，先跑 `devpilot-guard.js check <目标阶段>`（证据存在性校验）；产出经用户确认后 `--apply` 更新 state.yaml。`[HARD STOP]` 时停在当前阶段补证据。详见 CLAUDE.md「阶段守卫接入」。
+
 **阶段间上下文压缩规则（阶段推进 MUST）**：进入新阶段前，先运行
 `node "$FRAMEWORK/skills/jit-context-compress/scripts/compress-handoff.js" "<目标项目>" "<需求标识>" "<目标阶段>"`（prd/design/build/test/report/kb）
 生成 `docs/{需求标识}/.handoff/{阶段}.context.md`；AI **只读压缩包**恢复前序上下文 + 按「按需下钻建议」读原文档章节，**禁止全文复读前序文档**。源文档哈希未变时脚本自动复用旧包（详见 `/jit-context-compress`）。
@@ -202,7 +234,7 @@ DevPilot 是项目级流水线，Superpowers 是阶段内方法论。集成时�
 
 ## 知识库更新规则（流程闭环）
 - **不管哪种场景**，只要流程走到最后一步（测试报告完成），**必须**执行知识库增量更新
-- 增量更新：只更新本次变更涉及的章节，不需要全量重扫整个项目
+- 增量更新：只更新本次变更涉及的章节，不需要全量重扫整个项目；**禁止为单点 bug 跑任务2 全量扫描**（任务2 仅三情形：无 knowledge-base/ / 用户明说架构剧变 / INDEX 损坏无法抽出；超 IS_LARGE_PROJECT 阈值必须先问用户，详见 KNOWLEDGE_BASE_RULES.md 规则 11）
 - 知识库文档必须包含更新记录表：版本、日期、变更范围、说明
 - **MUST 更新需求索引表**：知识库维护需求索引表，每条需求一行，含标识、中文名、级别、涉及模块、版本
 - **MUST 在 CHANGELOG.md 追加知识库锚点**：知识库版本、涉及模块域（锚点统一在 CHANGELOG.md 维护，不在 00/01/02/03 等开发文档内重复）

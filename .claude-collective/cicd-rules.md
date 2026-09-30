@@ -37,6 +37,7 @@
 | 在需求标识确认前读取 `docs/{需求标识}/` 下的需求文档（00/01/02/03/05 等） | 🔴 严重 | 先确认标识，再读相关文档 |
 | 读取 `docs/knowledge-base/` 下的知识库（BASE/DETAIL/PUML 等） | ✅ **允许** | 知识库可随时检索。当作**当前事实**前 MUST 先跑 `verify-kb-facts.js`，只引用 pass。不限制读源码 |
 | 把 BASE/DETAIL 里的路径/符号/模块不经验证直接当事实 | 🔴 严重 | 先跑事实门控，只引用 `PROJECT_KNOWLEDGE_ADMITTED.md` / `query-admit.md` 的 pass |
+| 把 BASE/DETAIL 整本或大段贴进上下文 | 🔴 严重 | 只注入 pass 切片；BASE/DETAIL 作检索线索，按需下钻单个源码文件（注入法律 L1） |
 | 跳过标识确认直接分析需求 | 🔴 严重 | 必须先建议标识，等用户确认 |
 | 标识确认的同时并行读取代码 | 🟡 违规 | 标识确认是独立步骤，不与代码探索并行 |
 | 不提示用户直接创建需求目录 | 🔴 严重 | 必须先展示标识建议，用户确认后再创建 |
@@ -115,6 +116,10 @@ AI:   [目标项目 D:\my-app 已记住] 需求标识建议：user-login...
 ---
 
 ## 4. 任务3 执行顺序（MUST — 强制，不可调换，不可跳过）
+
+> **事实门控适用范围（CLAUDE.md 注入法律 L1）**：任务 3/4/5/6/9 在把知识库内容当「当前事实」引用前，MUST 带 `--query` 运行 `verify-kb-facts.js`；任务3 在步骤 ④ 必跑。**禁止**把 BASE/DETAIL 整本或大段贴进上下文（详见 CLAUDE.md「注入法律」）。
+>
+> **阶段守卫（CLAUDE.md 2.5.0 起 MUST）**：各阶段推进前先跑 `devpilot-guard.js check <目标阶段>`，产出经用户确认后 `--apply`；`[HARD STOP]` 停当前阶段。waiting_confirm 时禁止 --apply。
 
 **每一步都是阻塞的，必须等待用户确认后才能进行下一步。**
 

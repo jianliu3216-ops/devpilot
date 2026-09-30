@@ -152,6 +152,15 @@ Superpowers 不作为 DevPilot 主入口，只能在阶段内部增强执行质�
 
 门禁未通过时必须停留当前阶段，不得进入下一阶段。
 
+#### 3.7 阶段守卫与会话恢复协议（2.5.0 起 MUST）
+
+- **阶段推进**：进入新阶段前先跑
+  `node "$FRAMEWORK/skills/jit-devpilot-init/scripts/devpilot-guard.js" "<目标项目>" "<需求标识>" check "<目标阶段>"`
+  产出经用户确认后 `--apply`；`[HARD STOP]` 停当前阶段补证据；禁止手改 state.yaml 跳阶段（详见 CLAUDE.md「阶段守卫接入」）。
+- **会话中断恢复**：先跑 `resume` 命令 → 只读 state 输出 + `.handoff/{phase}.context.md`（注入法律 L2）→ 报告下一动作。
+- **禁止**：为恢复而全量生成知识库 / 重读 00–05 全文 / 重跑已完成阶段。
+- **旧需求兼容**：无 state.yaml 走推断模式（status 扫描）；需要时 `--init [S|M|L]` 补建。
+
 ## 产出
 
 | 输出 | 说明 |

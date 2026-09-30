@@ -109,6 +109,18 @@ function getKbIndexRows() {
   return rows;
 }
 
+// 2.7.0：机器索引 requirements[].id（无 INDEX.json 时返回 null，检查静默跳过）
+function getIndexJsonIds() {
+  const jsonPath = path.join(docsDir, "knowledge-base", "PROJECT_KNOWLEDGE_INDEX.json");
+  if (!exists(jsonPath)) return null;
+  try {
+    const data = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+    return new Set((data.requirements || []).map((r) => r.id));
+  } catch (e) {
+    return new Set();
+  }
+}
+
 function currentStage(reqDir, level, has05) {
   if (has05) return "已完成";
   if (level === "?") {
@@ -139,7 +151,7 @@ function currentStage(reqDir, level, has05) {
   return "待开始";
 }
 
-function scanRequirement(reqId, kbLevelMap) {
+function scanRequirement(reqId, kbLevelMap, indexIds) {
   const reqDir = path.join(docsDir, reqId);
   const changelogExists = exists(path.join(reqDir, "CHANGELOG.md"));
   const changelog = changelogExists
@@ -160,6 +172,8 @@ function scanRequirement(reqId, kbLevelMap) {
   const testDir = path.join(testsDir, reqId);
   const hasTests = exists(testDir);
   const has05 = exists(path.join(reqDir, STAGE_FILES["05"]));
+  // 2.7.0：有 05 但机器索引缺该需求条目 → 未完成
+  const missingIndexEntry = has05 && indexIds !== null && !indexIds.has(reqId);
 
   let status = "🔄 进行中";
   if (chg.status === "paused") status = "⏸️ 暂停";
@@ -167,6 +181,7 @@ function scanRequirement(reqId, kbLevelMap) {
   else if (level === "?") status = "⚠️ 待确认级别";
   else if (missing.length === 0 && has05) status = chg.status === "changed" ? "✅✅ 变更完成" : "✅ 已完成";
   else if (!exists(path.join(reqDir, STAGE_FILES["00"])) && !exists(path.join(reqDir, STAGE_FILES["01"]))) status = "⏳ 待开始";
+  if (missingIndexEntry && status.startsWith("✅")) status = "⚠️ 未完成（缺 INDEX 条目）";
 
   const stage = currentStage(reqDir, level, has05);
 
@@ -175,7 +190,7 @@ function scanRequirement(reqId, kbLevelMap) {
     level,
     status,
     stage,
-    missing: missing.map((k) => k === "kb-anchor" ? "CHANGELOG-知识库锚点" : (STAGE_FILES[k] || k)),
+    missing: missing.map((k) => k === "kb-anchor" ? "CHANGELOG-知识库锚点" : (STAGE_FILES[k] || k)).concat(missingIndexEntry ? ["INDEX-需求条目"] : []),
     tests: hasTests ? "✅ 有" : "—",
     chgNote: chg.note,
   };
@@ -184,6 +199,7 @@ function scanRequirement(reqId, kbLevelMap) {
 // --- main ---
 const reqDirs = listRequirementDirs();
 const kbIndex = getKbIndexRows();
+const indexIds = getIndexJsonIds();
 const kbLevelMap = Object.fromEntries(kbIndex.filter((r) => r.level).map((r) => [r.id, r.level]));
 const kbIds = new Set(kbIndex.map((r) => r.id));
 const allIds = [...new Set([...reqDirs, ...kbIndex.map((r) => r.id)])].sort();
@@ -201,6 +217,7 @@ console.log(`| 文件 | 状态 |`);
 console.log(`|------|------|`);
 console.log(`| PROJECT_KNOWLEDGE_BASE.md | ${exists(kbBase) ? "✅" : "❌ 缺失"} |`);
 console.log(`| PROJECT_KNOWLEDGE_DETAIL.md | ${exists(kbDetail) ? "✅" : "❌ 缺失"} |`);
+console.log(`| PROJECT_KNOWLEDGE_INDEX.json | ${indexIds !== null ? (indexIds.size ? `✅ ${indexIds.size} 条` : "⚠️ 空索引") : "❌ 缺失（跑 build-index.js）"} |`);
 console.log(`| 需求索引表 | ${kbIndex.length ? `✅ ${kbIndex.length} 条` : "⚠️ DETAIL 无索引表"} |`);
 console.log(`| CodeGraph | ${exists(codegraphDir) ? "✅ .codegraph 已存在" : "⚠️ 未发现 .codegraph（大项目建议先运行 codegraph build）"} |\n`);
 
@@ -213,7 +230,7 @@ if (allIds.length === 0) {
   console.log("| 标识 | 级别 | 状态 | 当前阶段 | 缺失文档 | 测试代码 |");
   console.log("|------|:--:|:--:|---------|---------|--------|");
   for (const id of allIds) {
-    const r = scanRequirement(id, kbLevelMap);
+    const r = scanRequirement(id, kbLevelMap, indexIds);
     const inDocs = reqDirs.includes(id);
     const inKbOnly = !inDocs && kbIds.has(id);
     const miss = r.missing.length ? r.missing.join(", ") : (inKbOnly ? "⚠️ 仅有KB索引无docs目录" : "—");
@@ -243,7 +260,7 @@ if (orphanDocs.length && kbIndex.length) {
 }
 
 console.log("## 下一步建议\n");
-const inProgress = allIds.map((id) => scanRequirement(id, kbLevelMap)).filter((r) => r.status.includes("进行中") || r.status.includes("变更"));
+const inProgress = allIds.map((id) => scanRequirement(id, kbLevelMap, indexIds)).filter((r) => r.status.includes("进行中") || r.status.includes("变更") || r.status.includes("未完成"));
 if (inProgress.length) {
   for (const r of inProgress) {
     console.log(`- **${r.id}** [${r.level}级]：${r.stage}`);

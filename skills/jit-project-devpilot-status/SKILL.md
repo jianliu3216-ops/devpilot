@@ -5,6 +5,8 @@ description: 扫描目标项目 docs/ 与 tests/ 目录，列出**全部**需求
 
 # DevPilot 智能流水线 - 状态
 
+> 💡 兼容提示（2.8.0）：自然语言已是主入口，本斜杠命令保留兼容。建议改说：**查看状态，目标项目：<路径>**
+
 **作用：** 新开会话后一键恢复工作状态；**必须列出当前所有需求的状态**，不得只汇报单个需求。
 
 详细规则见 [reference.md](reference.md)。
@@ -121,6 +123,8 @@ CodeGraph：✅ .codegraph 已存在 / ⚠️ 大项目建议先运行 codegraph
 ```
 
 自然语言触发：`查看状态`、`项目状态`、`目标项目：<路径> 状态`
+
+> **2.5.0 起与阶段守卫的关系**：需求目录存在 `state.yaml` 时，以 `state.phase` / `state.status` 为准（可用 `devpilot-guard.js resume` 读取）；无 state.yaml 走本 Skill 的文档推断模式。本脚本不改，提示仅供参考。
 
 ## 牢记规则
 

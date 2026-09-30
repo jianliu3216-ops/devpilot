@@ -5,6 +5,8 @@ description: DevPilot Skill 科学评估。静态确定性检查 + 可选 LLM �
 
 # jit-skill-eval — Skill 科学评估
 
+> 💡 兼容提示（2.8.0）：自然语言已是主入口，本斜杠命令保留兼容。建议改说：**评估 Skill**
+
 > 让 jit-* Skill 的演进有证据：改之前跑一次，改之后跑一次，用 Rubric 得分率判断变好还是变坏。
 
 ## 触发

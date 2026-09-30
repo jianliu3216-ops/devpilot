@@ -5,6 +5,8 @@ description: 扫描已有项目代码，生成 PROJECT_KNOWLEDGE_BASE.md。生�
 
 # 项目知识库构建（Project Knowledge Base Builder）
 
+> 💡 兼容提示（2.8.0）：自然语言已是主入口，本斜杠命令保留兼容。建议改说：**生成知识库，目标项目：<路径>**
+
 用于将“历史项目”快速沉淀为结构化文档 `PROJECT_KNOWLEDGE_BASE.md`，便于后续复用、评审与上手。
 
 ---
@@ -726,6 +728,22 @@ fail 断言写入交付说明即可，不阻断知识库生成完成；但后续
 > - 第二层：`PROJECT_KNOWLEDGE_DETAIL.md` = 深度备查层（开发参考手册）
 > - 第三层：`PROJECT_KNOWLEDGE_DETAIL-{模块域}.md` = 超大项目分卷（>50 模块时自动拆分）
 > - PUML 文件：多个独立流程图文件，每个流程一个文件
+> - **机器索引（2.6.0 起）**：`PROJECT_KNOWLEDGE_INDEX.md/.json` = 机器检索主入口，由 `scripts/build-index.js` 生成
+
+**任务2 合格定义（2.6.0 起）**：无 `PROJECT_KNOWLEDGE_INDEX.md/.json` 即任务2 失败（validate-kb.js 会报 error）。生成完三层文件后必须运行：
+
+```bash
+node skills/jit-project-knowledge-base/scripts/build-index.js <目标项目>
+```
+
+### 机器索引规格（PROJECT_KNOWLEDGE_INDEX）
+
+- `INDEX.json` 字段锁定：`kb_version`（与 BASE 版本号一致，抽不出写 `unknown`）、`modules[]{id,title,paths,symbols,detail_section,requirements}`、`requirements[]{id,title,level,modules,docs}`
+- **抽不出的字段一律写 `unknown`，禁止编造**
+- 只扫 BASE/DETAIL 文本与 `docs/` 目录名，不扫源码
+- `INDEX.md` 为人读镜像；`INDEX.json` 为机器检索主入口
+- 检索顺序（全流程统一）：先 INDEX 命中 → `verify-kb-facts.js --query` 门控 pass → 按需下钻 DETAIL 对应节 / 1–3 个源码文件
+- BASE 骨架限制：BASE 只允许骨架章节（概览/技术栈/模块表/文档指针/PUML 索引/CodeGraph 状态/版本记录），超长叙述下沉 DETAIL
 
 ---
 
@@ -851,6 +869,9 @@ fail 断言写入交付说明即可，不阻断知识库生成完成；但后续
 - [ ] BASE 底部有跳转链接：「📚 深度分析请查阅 PROJECT_KNOWLEDGE_DETAIL.md」
 - [ ] DETAIL 顶部有反向链接：「📖 快速入门请查阅 PROJECT_KNOWLEDGE_BASE.md」
 - [ ] **（超大项目）按业务域拆分了 DETAIL 分卷，BASE 中有分卷索引表**
+- [ ] **`PROJECT_KNOWLEDGE_INDEX.md/.json` 已生成**（运行 `build-index.js`；缺任一 = 任务2 失败）
+- [ ] **INDEX.json kb_version 与 BASE 版本号一致**（不一致 validate-kb 报 warning）
+- [ ] **INDEX 抽不出的字段均为 `unknown`，无编造内容**
 
 ---
 

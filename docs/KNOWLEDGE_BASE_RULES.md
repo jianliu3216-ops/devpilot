@@ -126,6 +126,7 @@ title {流程图标题}
 | 文件 | 定位 | 更新频率 | 优先级 |
 |------|------|---------|-------|
 | `docs/knowledge-base/*.puml` | 流程事实标准 | 实时，代码流程变了必须先更图 | P0 |
+| `PROJECT_KNOWLEDGE_INDEX.json/.md` | 机器索引主入口（2.6.0） | 每次知识库生成/增量更新后由 `build-index.js` 重建 | P0（检索入口） |
 | `PROJECT_KNOWLEDGE_DETAIL-*.md` | 深度备查手册 | 中频，核心模块变更时更新 | P1 |
 | `PROJECT_KNOWLEDGE_BASE.md` (BASE) | 快速入门索引 | 低频，重大架构变更时更新 | P2 |
 | `PROJECT_KNOWLEDGE_ADMITTED.md` | 代码预言机准入清单 | 每次生成/更新知识库后、每次注入上下文前刷新 | P0（引用事实时） |
@@ -147,3 +148,44 @@ node "$FRAMEWORK/skills/jit-project-knowledge-fact-gate/scripts/verify-kb-facts.
 - 抽不出路径/符号/模块/路由/环境变量的叙述只作线索，引用前必须对照源码
 - 本规则不限制读取源码，不缩小知识库检索范围
 - 任务 2 生成后、任务 8.5 更新后也必须刷新准入文件
+
+---
+
+## 规则 9：机器索引与 BASE 骨架限制（2.6.0）
+
+**机器索引**：任务2 / 任务8.5 必须产出并刷新 `PROJECT_KNOWLEDGE_INDEX.md/.json`（`build-index.js` 生成）。
+
+- `INDEX.json` 为机器检索主入口：`kb_version` + `modules[]{id,title,paths,symbols,detail_section,requirements}` + `requirements[]{id,title,level,modules,docs}`
+- 抽不出的字段写 `unknown`，**禁止编造**
+- 需求索引权威在 `INDEX.json`；DETAIL `## 需求索引` 表为人读镜像（双写，两处同步）
+- validate-kb.js：缺 INDEX 即 error；kb_version 与 BASE 不一致报 warning
+
+**BASE 骨架限制**：BASE 只允许骨架章节——项目概览、技术栈表、模块摘要表、文档/PUML 索引、CodeGraph 状态、版本记录；超长叙述一律下沉 DETAIL（可按模块逐步下沉，禁止一次性重写）。BASE 合格标准：人 5–10 分钟读完目录。
+
+---
+
+## 规则 10：统一检索顺序（INDEX → 门控 → 下钻）
+
+任何阶段查知识库，一律按固定顺序：
+
+1. **INDEX 命中**：先查 `PROJECT_KNOWLEDGE_INDEX.json`，定位 1–N 个候选模块/需求（拿到 `detail_section` 与 `paths`）
+2. **事实门控**：`verify-kb-facts.js --query "<当前任务关键词>"`，只取 pass
+3. **按需下钻**：只打开命中的 DETAIL 对应节 + 1–3 个源码文件
+
+禁止：整本 BASE / DETAIL 贴入上下文（引用 CLAUDE.md 注入法律 L1）；跳过 INDEX 直接翻 DETAIL 找章节。
+
+---
+
+## 规则 11：日常增量禁令（2.7.0）
+
+**日常 90% 路径**：INDEX 检索 → `--query` 事实门控 → 改 1–3 文件 → 任务8.5 白名单回写（INDEX 条 + DETAIL 命中节 + CHANGELOG 锚点 + ADMITTED 刷新）。
+
+硬禁令：
+
+1. **禁止**为单点 bug 修复跑任务2 全量扫描
+2. **禁止**把「知识库更新」理解为重扫全仓；任务8.5 只改白名单四项
+3. 任务2（全量）**仅三种情形**：目标项目无 `docs/knowledge-base/`；用户明确说「架构大变，全量重建」；preflight 判定 INDEX 损坏且无法从现有文档抽出
+4. 全量预估超 `IS_LARGE_PROJECT` 阈值必须先问用户并展示 preflight 数据，禁止默默跑半天
+5. 任务8.5 **禁止**为「完整」扩写未命中模块的 DETAIL；未命中模块一行不动
+
+知识库维护者 = 改这段代码的人。fail 条目失去「当事实」权力，必须下钻源码（衔接规则 8）。

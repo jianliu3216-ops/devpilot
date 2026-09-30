@@ -5,6 +5,8 @@ description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求
 
 # jit-project-knowledge-base-update — 知识库增量更新
 
+> 💡 兼容提示（2.8.0）：自然语言已是主入口，本斜杠命令保留兼容。建议改说：**更新知识库**
+
 > **运行环境：Claude Code**。需求完成或变更后执行，不全量重扫。
 
 ## 触发
@@ -31,6 +33,24 @@ description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求
 | `docs/knowledge-base/*.puml` | 流程变更时优先更新 |
 
 ## 执行步骤（固定顺序）
+
+### 0. 更新白名单（2.7.0 起，硬边界）
+
+任务8.5 **只允许改四类内容**，白名单之外一行不动：
+
+| 白名单 | 动作 |
+|--------|------|
+| `PROJECT_KNOWLEDGE_INDEX.json/.md` | 刷新本次需求对应条目（`build-index.js` 重跑即可） |
+| `PROJECT_KNOWLEDGE_DETAIL*.md` | 只改本次需求命中的模块节 + 需求索引行 + 更新记录 |
+| `docs/{需求标识}/CHANGELOG.md` | 知识库锚点 |
+| `PROJECT_KNOWLEDGE_ADMITTED.md` | 事实门控刷新 |
+
+**禁改清单（违反即返工）**：
+
+- 未命中模块的 DETAIL 章节（禁止为「完整」扩写）
+- BASE 全文重写（BASE 只在架构剧变时按任务2 更新）
+- 与本次需求无关的 PUML（禁止删掉重写）
+- 禁止为单点 bug 跑任务2 全量重扫（规则 11；任务2 仅三情形：无 knowledge-base/ / 用户明说架构剧变 / INDEX 损坏无法抽出）
 
 ### 1. 判断更新范围
 
@@ -59,9 +79,11 @@ description: DevPilot 任务8.5 — 知识库增量更新。更新 DETAIL 需求
 ### 4. 自检清单
 
 - [ ] DETAIL 需求索引已更新
+- [ ] INDEX 条目已刷新（`build-index.js` 重跑）
 - [ ] 函数清单表已同步
 - [ ] PUML 变更记录已追加（若涉及）
 - [ ] BASE/DETAIL/PUML 版本号一致
+- [ ] 白名单外文件零改动
 
 ### 5. 运行知识库校验
 

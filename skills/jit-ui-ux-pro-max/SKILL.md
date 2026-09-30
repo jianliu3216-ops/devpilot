@@ -4,6 +4,8 @@ description: UI/UX 智能设计引擎。覆盖 67 种设计风格、96 套配色
 ---
 # UI/UX Pro Max - Design Intelligence
 
+> 💡 兼容提示（2.8.0）：自然语言已是主入口，本斜杠命令保留兼容。建议改说：**UI 设计：<需求>**
+
 > Claude Code：执行脚本前读取 `~/.claude/devpilot-framework-path` 得到 `$FRAMEWORK`，脚本路径为 `$FRAMEWORK/skills/jit-ui-ux-pro-max/scripts/search.py`。
 
 Comprehensive design guide for web and mobile applications. Contains 67 styles, 96 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types across 13 technology stacks. Searchable database with priority-based recommendations.

@@ -11,6 +11,8 @@
  * Checks the minimum structure required by DevPilot:
  * - docs/knowledge-base/PROJECT_KNOWLEDGE_BASE.md
  * - docs/knowledge-base/PROJECT_KNOWLEDGE_DETAIL.md
+ * - docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.md and .json (2.6.0)
+ * - INDEX kb_version consistency with BASE (warning when mismatched)
  * - DETAIL sections for requirement index, function/API change index, update records
  * - requirement docs with CHANGELOG.md containing a 知识库锚点 section
  * - large projects should have a .codegraph directory
@@ -86,6 +88,28 @@ if (detail) {
     if (!hasSection(detail, section)) {
       errors.push(`PROJECT_KNOWLEDGE_DETAIL.md missing section: ## ${section}`);
     }
+  }
+}
+
+// 2.6.0: machine index files are mandatory task-2 outputs.
+const indexMdPath = path.join(kbDir, "PROJECT_KNOWLEDGE_INDEX.md");
+const indexJsonPath = path.join(kbDir, "PROJECT_KNOWLEDGE_INDEX.json");
+if (!exists(indexMdPath)) {
+  errors.push("Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.md. Run build-index.js.");
+}
+if (!exists(indexJsonPath)) {
+  errors.push("Missing docs/knowledge-base/PROJECT_KNOWLEDGE_INDEX.json. Run build-index.js.");
+} else {
+  try {
+    const indexJson = JSON.parse(readText(indexJsonPath));
+    const baseVersion = (readText(basePath).match(/v\d+\.\d+(\.\d+)?/) || [])[0];
+    if (indexJson.kb_version === "unknown") {
+      warnings.push("PROJECT_KNOWLEDGE_INDEX.json kb_version is unknown; rebuild with build-index.js.");
+    } else if (baseVersion && indexJson.kb_version !== baseVersion.replace(/^v/, "")) {
+      warnings.push(`PROJECT_KNOWLEDGE_INDEX.json kb_version (${indexJson.kb_version}) does not match BASE version (${baseVersion}). Rebuild with build-index.js.`);
+    }
+  } catch (parseError) {
+    errors.push(`PROJECT_KNOWLEDGE_INDEX.json is not valid JSON: ${parseError.message}`);
   }
 }
 
